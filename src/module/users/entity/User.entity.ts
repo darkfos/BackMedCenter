@@ -24,10 +24,10 @@ export class User {
     @Column({ type: 'boolean', nullable: true, default: false })
     isAdmin!: boolean;
 
-    @Column({ type: 'date', nullable: false, default: Date.now() })
+    @Column({ type: 'date', nullable: false, default: '23-12-2025' })
     createdAt!: Date;
 
-    @Column({ type: 'date', nullable: false, default: Date.now() })
+    @Column({ type: 'date', nullable: false, default: '23-12-2025' })
     updatedAt!: Date;
 
     @Column({ type: 'enum', enum: UserTypes, default: UserTypes.PACIENT, })

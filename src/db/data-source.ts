@@ -1,4 +1,6 @@
 import { DataSource } from "typeorm";
+import * as path from "node:path";
+
 import { dbConfig } from "../../conf/dbConfig.js";
 import { User } from "../module/users/entity/User.entity.js";
 
@@ -15,6 +17,6 @@ export const dbSource = new DataSource({
         User
     ],
     subscribers: [],
-    migrations: [],
+    migrations: [path.join(process.cwd(), 'dist/src/db/migrations/*.js')],
     migrationsTableName: 'migrations',
 })
