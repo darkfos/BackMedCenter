@@ -4,11 +4,11 @@ config();
 
 class DBConfig {
 
-    private MED_DB_HOST: string = process.env.MED_DB_HOST;
-    private MED_DB_PORT: string = process.env.MED_DB_PORT
-    private MED_DB_USER: string = process.env.MED_DB_USER;
-    private MED_DB_NAME: string = process.env.MED_DB_NAME;
-    private MED_DB_PASSWORD: string = process.env.MED_DB_PASSWORD;
+    private MED_DB_HOST: string = process.env.MED_DB_HOST ?? 'localhost';
+    private MED_DB_PORT: number = Number(process.env.MED_DB_PORT) ?? 5432
+    private MED_DB_USER: string = process.env.MED_DB_USER ?? 'postgres';
+    private MED_DB_NAME: string = process.env.MED_DB_NAME ?? 'postgres';
+    private MED_DB_PASSWORD: string = process.env.MED_DB_PASSWORD ?? 'postgres';
 
     get db_host() {
         return this.MED_DB_HOST;

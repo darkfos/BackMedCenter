@@ -1,30 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { UserTypes } from "./UserTypes.entity.js";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
+export enum UserTypes {
+    DOCTOR = 'doctor',
+    PACIENT = 'pacient',
+    REGISTER = 'register',
+    MANAGER = 'manager'
+}
 
 @Entity({ name: 'users' })
 export class User {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({ type: 'varchar', length: 125, nullable: false })
-    email: string;
+    email!: string;
 
     @Column({ type: 'text', nullable: false })
-    password: string;
+    password!: string;
 
     @Column({ type: 'varchar', length: 255, nullable: true, default: 'Пользователь' })
-    fullName: string;
+    fullName!: string;
 
     @Column({ type: 'boolean', nullable: true, default: false })
-    isAdmin: boolean;
+    isAdmin!: boolean;
 
     @Column({ type: 'date', nullable: false, default: Date.now() })
-    createdAt: Date;
+    createdAt!: Date;
 
     @Column({ type: 'date', nullable: false, default: Date.now() })
-    updatedAt: Date;
+    updatedAt!: Date;
 
-    @ManyToOne(() => UserTypes, (userTypes) => userTypes.users)
-    userType: UserTypes
+    @Column({ type: 'enum', enum: UserTypes, default: UserTypes.PACIENT, })
+    userType!: UserTypes;
 }

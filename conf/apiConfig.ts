@@ -4,11 +4,11 @@ config();
 
 class ApiConfig {
 
-    private ACCESS_TOKEN_KEY: string = process.env.ACCESS_TOKEN_KEY;
-    private REFRESH_TOKEN_KEY: string = process.env.REFRESH_TOKEN_KEY;
-    private EXPIRE_ACCESS_TOKEN: string = process.env.ACCESS_EXPIRE_TIME_LIFE;
-    private EXPIRE_REFRESH_TOKEN: string = process.env.REFRESH_EXPIRE_TIME_LIFE;
-    private ALGORITHM: string = process.env.ALGORITHM;
+    private ACCESS_TOKEN_KEY: string = process.env.ACCESS_TOKEN_KEY ?? 'access-token';
+    private REFRESH_TOKEN_KEY: string = process.env.REFRESH_TOKEN_KEY ?? 'refresh-token';
+    private EXPIRE_ACCESS_TOKEN: number = Number(process.env.ACCESS_EXPIRE_TIME_LIFE) ?? 30;
+    private EXPIRE_REFRESH_TOKEN: number = Number(process.env.REFRESH_EXPIRE_TIME_LIFE) ?? 30;
+    private ALGORITHM: string = process.env.ALGORITHM ?? 'HS256';
 
     get access_token() {
         return this.ACCESS_TOKEN_KEY;
