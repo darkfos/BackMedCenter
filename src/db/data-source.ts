@@ -2,7 +2,6 @@ import { DataSource } from "typeorm";
 import * as path from "node:path";
 
 import { dbConfig } from "../../conf/dbConfig.js";
-import { User } from "../module/users/entity/User.entity.js";
 
 export const dbSource = new DataSource({
     type: 'postgres',
@@ -14,7 +13,7 @@ export const dbSource = new DataSource({
     synchronize: false,
     logging: true,
     entities: [
-        User
+        path.join(path.join(process.cwd(), "dist/src/module/**/*.js")),
     ],
     subscribers: [],
     migrations: [path.join(process.cwd(), 'dist/src/db/migrations/*.js')],
