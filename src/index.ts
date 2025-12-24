@@ -5,7 +5,7 @@ import { createRequire } from "node:module";
 
 import { apiConfig } from "@/conf/apiConfig.js";
 import { dbSource } from "@/db/data-source.js";
-import { authRouter } from "@/module/auth/controller/authController.js";
+import { authRouter } from "@/module/auth/controller/auth.controller.js";
 
 const require = createRequire(import.meta.url);
 const app = express();
