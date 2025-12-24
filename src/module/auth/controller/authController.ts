@@ -1,13 +1,13 @@
 import { Router, type Request, type Response } from "express";
 
-import { UserService } from '@/module/users/service/user.service.js';
+import { UserService } from "@/module/users/service/user.service.js";
 import { RegUserInfo } from "@/module/auth/dto/Auth.dto.js";
-import {AuthService} from "@/module/auth/service/AuthService.js";
+import { AuthService } from "@/module/auth/service/AuthService.js";
 
 export const authRouter = Router();
 
 authRouter.post("/register", async (req: Request, res: Response) => {
-    /*
+  /*
       #swagger.method = 'post'
       #swagger.tags = ['Auth']
       #swagger.summary = 'Регистрация пользователя'
@@ -34,16 +34,17 @@ authRouter.post("/register", async (req: Request, res: Response) => {
       }
      */
 
-    const userData: RegUserInfo = req.body;
-    const newUser = await UserService.createUser(userData);
-    if (newUser) {
-        return res.status(201).json({'message': 'Пользователь был зарегистрирован'});
-    }
+  const userData: RegUserInfo = req.body;
+  const newUser = await UserService.createUser(userData);
+  if (newUser) {
+    return res
+      .status(201)
+      .json({ message: "Пользователь был зарегистрирован" });
+  }
 });
 
-
 authRouter.post("/login", async (req: Request, res: Response) => {
-    /*
+  /*
         #swagger.method = 'POST'
         #swagger.tags = ['Auth']
         #swagger.summary = 'Авторизация пользователя'
@@ -61,19 +62,17 @@ authRouter.post("/login", async (req: Request, res: Response) => {
         }
     */
 
-    const userData: RegUserInfo = req.body;
-    const [accessToken, refreshToken] = await AuthService.login(userData);
+  const userData: RegUserInfo = req.body;
+  const [accessToken, refreshToken] = await AuthService.login(userData);
 
-    if (accessToken && refreshToken) {
-        return res.status(200).json(
-            {
-                accessToken,
-                refreshToken,
-            }
-        )
-    }
+  if (accessToken && refreshToken) {
+    return res.status(200).json({
+      accessToken,
+      refreshToken,
+    });
+  }
 
-    res.status(401).send({
-        message: 'Не удалось аутентифицировать пользователя'
-    })
-})
+  res.status(401).send({
+    message: "Не удалось аутентифицировать пользователя",
+  });
+});

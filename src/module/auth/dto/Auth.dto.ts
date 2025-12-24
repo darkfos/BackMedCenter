@@ -1,4 +1,4 @@
 export interface RegUserInfo {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }

@@ -1,5 +1,5 @@
 import express from "express";
-import swaggerUI from 'swagger-ui-express';
+import swaggerUI from "swagger-ui-express";
 import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
 
@@ -11,13 +11,17 @@ const require = createRequire(import.meta.url);
 const app = express();
 
 app.use(express.json());
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(require(join(resolve(), 'swagger.json'))));
+app.use(
+  "/api-docs",
+  swaggerUI.serve,
+  swaggerUI.setup(require(join(resolve(), "swagger.json"))),
+);
 
 // Router's
-app.use('/auth', authRouter);
+app.use("/auth", authRouter);
 
 dbSource.initialize().then(() => {
-    app.listen(apiConfig.port, () => {
-        console.log(`Listening on port: ${apiConfig.port}`);
-    })
-})
+  app.listen(apiConfig.port, () => {
+    console.log(`Listening on port: ${apiConfig.port}`);
+  });
+});

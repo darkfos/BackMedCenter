@@ -1,0 +1,12 @@
+# Ignore artifacts:
+build
+coverage
+
+**/.git
+**/node_modules
+swagger.json
+tsconfig.json
+package.json
+package-lock.json
+eslint.config.ts
+.prettierrc

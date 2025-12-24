@@ -6,56 +6,61 @@ import { join, resolve } from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outputFile = path.join(__dirname, "..", "..", "..", "..", "swagger.json");
-const endpointsFiles = await glob(join(resolve() as string, 'dist/src/module/*/controller/*.js'), () => {});
+const endpointsFiles = await glob(
+  join(resolve() as string, "dist/src/module/*/controller/*.js"),
+  () => {},
+);
 
 const doc = {
-    info: {
-        title: 'MedCenter Back',
-        description: 'API for MedCenter'
+  info: {
+    title: "MedCenter Back",
+    description: "API for MedCenter",
+  },
+  tags: [
+    {
+      name: "Auth",
+      description: "Модуль авторизации-аутентификации",
     },
-    tags: [
-        {
-            name: 'Auth',
-            description: 'Модуль авторизации-аутентификации'
-        },
-        {
-            name: "User",
-            description: "Модуль пользователей"
-        }
+    {
+      name: "User",
+      description: "Модуль пользователей",
+    },
+  ],
+  definitions: {
+    AuthReg: {
+      message: "Сообщение",
+    },
+    AuthUserData: {
+      email: "test@mail.ru",
+      password: "test_user_password",
+    },
+    User: {
+      id: "1",
+      email: "test@mail.ru",
+      password: "secret-password",
+      fullName: "user",
+      isAdmin: false,
+      createdAt: "24-12-2025",
+      updatedAt: "24-12-2025",
+      userType: {
+        default: "doctor",
+        "@enum": ["doctor", "pacient", "register", "manager"],
+      },
+    },
+    Users: [
+      {
+        $ref: "#/definitions/User",
+      },
     ],
-    definitions: {
-        AuthReg: {
-            message: 'Сообщение'
-        },
-        AuthUserData: {
-            email: 'test@mail.ru',
-            password: 'test_user_password'
-        },
-        User: {
-            id: '1',
-            email: 'test@mail.ru',
-            password: 'secret-password',
-            fullName: 'user',
-            isAdmin: false,
-            createdAt: '24-12-2025',
-            updatedAt: '24-12-2025',
-            userType: {
-                default: 'doctor',
-                '@enum': ['doctor', 'pacient', 'register', 'manager']
-            },
-        },
-        Users: [
-            {
-                $ref: '#/definitions/User'
-            }
-        ],
-    },
-    host: 'localhost:8088',
-    schemes: ['http']
-}
+  },
+  host: "localhost:8088",
+  schemes: ["http"],
+};
 
-swaggerAutogen(/* options */)(outputFile, endpointsFiles, doc).then(() => {
-    console.log('Swagger was generated successfully.');
-}).catch(() => {
+swaggerAutogen(/* options */)(outputFile, endpointsFiles, doc)
+  .then(() => {
+    console.log("Swagger was generated successfully.");
+  })
+  .catch(() => {
     console.log("Swagger doesn't generated successfully.");
-});
+  });
