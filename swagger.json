@@ -1,0 +1,138 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "MedCenter Back",
+    "description": "API for MedCenter",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8088",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Модуль авторизации-аутентификации"
+    },
+    {
+      "name": "User",
+      "description": "Модуль пользователей"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Регистрация пользователя",
+        "description": "Регистрация пользователя",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Пользовательские данные для регистрации",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegUserData"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Пользователь был зарегистрирован",
+            "schema": {
+              "$ref": "#/definitions/AuthReg"
+            }
+          },
+          "400": {
+            "description": "Не удалось зарегистрировать пользователя",
+            "schema": {
+              "$ref": "#/definitions/AuthReg"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AuthReg": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "Сообщение"
+        }
+      }
+    },
+    "RegUserData": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "test@mail.ru"
+        },
+        "password": {
+          "type": "string",
+          "example": "test_user_password"
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "1"
+        },
+        "email": {
+          "type": "string",
+          "example": "test@mail.ru"
+        },
+        "password": {
+          "type": "string",
+          "example": "secret-password"
+        },
+        "fullName": {
+          "type": "string",
+          "example": "user"
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "example": false
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "24-12-2025"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "24-12-2025"
+        },
+        "userType": {
+          "default": "doctor",
+          "type": "string",
+          "enum": [
+            "doctor",
+            "pacient",
+            "register",
+            "manager"
+          ]
+        }
+      }
+    },
+    "Users": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/User"
+      }
+    }
+  }
+}
