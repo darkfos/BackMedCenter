@@ -17,9 +17,19 @@ export async function authMiddleware(req: Request & JwtPayload, res: Response, n
 
         if (userRefreshData) {
             const newToken = generateToken({ email: (userRefreshData as JwtPayload)?.email }, 'access');
+
+            res.set({'token': newToken});
             req.token = newToken;
+
+            return next();
         }
     }
 
     return res.status(401).send({ message: 'Не удалось аутентифицировать пользователя' });
+}
+
+
+export async function postAuthMiddleware(req: Request & JwtPayload, res: Response, next: NextFunction) {
+    // POST Middleware
+    return next();
 }
