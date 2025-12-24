@@ -41,6 +41,10 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@/conf/*": ["./conf/*"],
+      "@/*": ["./src/*"]
+    }
   }
 }

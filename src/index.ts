@@ -3,9 +3,9 @@ import swaggerUI from 'swagger-ui-express';
 import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
 
-import { apiConfig } from "../conf/apiConfig.js";
-import { dbSource } from "./db/data-source.js";
-import { authRouter } from "./module/auth/controller/authController.js";
+import { apiConfig } from "@/conf/apiConfig.js";
+import { dbSource } from "@/db/data-source.js";
+import { authRouter } from "@/module/auth/controller/authController.js";
 
 const require = createRequire(import.meta.url);
 const app = express();

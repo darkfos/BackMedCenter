@@ -1,9 +1,9 @@
 import { Repository } from "typeorm";
 
-import { dbSource } from '../../../db/data-source.js';
-import { User } from "../entity/User.entity.js";
-import { RegUserInfo } from "../../auth/dto/Auth.dto.js";
-import { hashPassword } from "../../../utils/other/hash_password.js";
+import { dbSource } from '@/db/data-source.js';
+import { User } from "@/module/users/entity/User.entity.js";
+import { RegUserInfo } from "@/module/auth/dto/Auth.dto.js";
+import { hashPassword } from "@/utils/other/hash_password.js";
 
 
 export class UserService {

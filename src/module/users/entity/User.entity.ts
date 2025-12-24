@@ -6,7 +6,7 @@ import {
     UpdateDateColumn
 } from "typeorm";
 
-import { UserTypes } from "../../../utils/shared/entities_enums.js";
+import { UserTypes } from "@/utils/shared/entities_enums.js";
 
 @Entity({ name: 'users' })
 export class User {

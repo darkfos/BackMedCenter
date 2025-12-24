@@ -1,7 +1,7 @@
 import { DataSource } from "typeorm";
 import * as path from "node:path";
 
-import { dbConfig } from "../../conf/dbConfig.js";
+import { dbConfig } from "@/conf/dbConfig.js";
 
 export const dbSource = new DataSource({
     type: 'postgres',
