@@ -27,7 +27,7 @@ const doc = {
         AuthReg: {
             message: 'Сообщение'
         },
-        RegUserData: {
+        AuthUserData: {
             email: 'test@mail.ru',
             password: 'test_user_password'
         },
