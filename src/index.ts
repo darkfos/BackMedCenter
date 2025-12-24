@@ -21,6 +21,7 @@ app.use(
 app.use("/auth", authRouter);
 
 dbSource.initialize().then(() => {
+}).finally(() => {
   app.listen(apiConfig.port, () => {
     console.log(`Listening on port: ${apiConfig.port}`);
   });

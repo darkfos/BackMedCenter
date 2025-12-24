@@ -11,4 +11,4 @@ RUN npm run build
 
 EXPOSE 8088
 
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npm run migration && npm run start"]
