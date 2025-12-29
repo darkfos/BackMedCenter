@@ -1,10 +1,10 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
+import { JwtPayload } from "jsonwebtoken";
 
-import { News } from "@/module/news/dto/News.dto.js";
+import {News, NewsFilter} from "@/module/news/dto/News.dto.js";
 import { NewsService } from "@/module/news/service/NewsService.js";
 import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
-import { JwtPayload } from "jsonwebtoken";
 
 export const newsRouter = Router();
 
@@ -73,6 +73,42 @@ newsRouter.delete("/delete", authMiddleware, async (req: Request & JwtPayload, r
     return res.status(400).send({ description: 'Не удалось удалить новость' });
 });
 
+newsRouter.get('/list', async (req: Request & JwtPayload, res: Response) => {
+    /*
+        #swagger.method = 'GET'
+        #swagger.tags = ['News']
+        #swagger.summary = 'Список новостей'
+        #swagger.description = 'Получения списка новостей по фильтрам'
+        #swagger.produces = ['application/json']
+        #swagger.consumes = ['application/json']
+
+        #swagger.parameters['body'] = {
+            in: 'body',
+            description: "Фильтры доя получения новостей",
+            required: false,
+            schema: {
+                $ref: '#/definitions/NewsFilters'
+            }
+        }
+
+        #swagger.responses[200] = {
+            schema: {
+                $ref: '#/definitions/NewsList'
+            }
+        }
+        #swagger.responses[400] = {
+            $ref: '#/definitions/List'
+        }
+    */
+    const news = await NewsService.getAll(req.body ?? {} as NewsFilter);
+
+    if (news[0].length) {
+        return res.status(200).json({list: news[0], total: news[1]});
+    }
+
+    return res.status(400).json({list: [], total: 0});
+});
+
 newsRouter.post("/create", authMiddleware, async (req: Request & JwtPayload, res: Response) => {
     /*
         #swagger.method = 'POST'
@@ -116,4 +152,4 @@ newsRouter.post("/create", authMiddleware, async (req: Request & JwtPayload, res
             description: 'Не удалось создать новость'
         }
     )
-})
+});

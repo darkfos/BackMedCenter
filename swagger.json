@@ -21,6 +21,115 @@
     "http"
   ],
   "paths": {
+    "/create": {
+      "post": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Создание новости",
+        "description": "Создание новости по выбранной теме",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Данные новой новости",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateNews"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Новость была создана",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось создать новость",
+            "$ref": "#/definitions/Message"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/delete": {
+      "delete": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Удаление новости",
+        "description": "Удаление новости администратором",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор новости",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Новость была удалена",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось удалить новость",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/list": {
+      "get": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Список новостей",
+        "description": "Получения списка новостей",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/NewsList"
+            }
+          },
+          "400": {
+            "$ref": "#/definitions/List",
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/register": {
       "post": {
         "tags": [
@@ -184,88 +293,6 @@
           }
         }
       }
-    },
-    "/create": {
-      "post": {
-        "tags": [
-          "News"
-        ],
-        "summary": "Создание новости",
-        "description": "Создание новости по выбранной теме",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "Пользовательские данные для авторизации",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/CreateNews"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Новость была создана",
-            "schema": {
-              "$ref": "#/definitions/Message"
-            }
-          },
-          "400": {
-            "description": "Не удалось создать новость",
-            "$ref": "#/definitions/Message"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/delete": {
-      "delete": {
-        "tags": [
-          "News"
-        ],
-        "summary": "Удаление новости",
-        "description": "Удаление новости администратором",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "description": "Идентификатор новости",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Новость была удалена",
-            "schema": {
-              "$ref": "#/definitions/Message"
-            }
-          },
-          "400": {
-            "description": "Не удалось удалить новость",
-            "schema": {
-              "$ref": "#/definitions/Message"
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
     }
   },
   "definitions": {
@@ -371,6 +398,57 @@
             "CONFERENCE",
             "PERSONAL"
           ]
+        }
+      }
+    },
+    "ClearList": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        }
+      }
+    },
+    "NewsList": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "example": "Заголовок новости"
+              },
+              "description": {
+                "type": "string",
+                "example": "Описание новости"
+              },
+              "type": {
+                "default": "GENERAL",
+                "type": "string",
+                "enum": [
+                  "GENERAL",
+                  "MED",
+                  "SOCIAL",
+                  "EVENTS",
+                  "CONFERENCE",
+                  "PERSONAL"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "24-12-2025"
+              },
+              "updatedAt": {
+                "type": "string",
+                "example": "24-12-2025"
+              }
+            }
+          }
         }
       }
     }

@@ -6,3 +6,8 @@ export interface News {
     type: NewsTypes;
     userid?: number;
 }
+
+export interface NewsFilter extends News {
+    createDate?: Date;
+    updateDate?: Date;
+}

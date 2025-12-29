@@ -1,7 +1,9 @@
+import { FindOptionsWhere, ILike } from "typeorm";
+
 import { dbSource } from "@/db/data-source.js";
 import { News as NewsTable } from "@/module/news/entity/News.entity.js";
 
-import type { News } from "@/module/news/dto/News.dto.js";
+import type {News, NewsFilter} from "@/module/news/dto/News.dto.js";
 import { User } from "@/module/users/entity/User.entity.js";
 import { AuthService } from "@/module/auth/service/AuthService.js";
 
@@ -30,5 +32,34 @@ export class NewsService {
         }
 
         return false;
+    }
+
+    static async getAll(filters: Partial<NewsFilter>) {
+        const where: FindOptionsWhere<NewsFilter> = {};
+
+        if (filters.type) {
+            where['type'] = filters.type;
+        }
+
+        if (filters.description) {
+            where['description'] = ILike(`%${filters.description}%`);
+        }
+
+        if (filters.title) {
+            where['title'] = ILike(`%${filters.title}%`)
+        }
+
+        if (filters.createDate) {
+            where['createDate'] = filters.createDate;
+        }
+
+        if (filters.updateDate) {
+            where['updateDate'] = filters.updateDate;
+        }
+
+
+        return await this.repository.findAndCount({
+            where
+        })
     }
 }

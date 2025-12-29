@@ -63,7 +63,36 @@ const doc = {
         default: "GENERAL",
         "@enum": ["GENERAL", "MED", "SOCIAL", "EVENTS", "CONFERENCE", "PERSONAL"]
       }
-    }
+    },
+    ClearList: {
+      list: [],
+      total: 0
+    },
+    NewsList: {
+      list: [
+        {
+          title: 'Заголовок новости',
+          description: 'Описание новости',
+          type: {
+            default: "GENERAL",
+            "@enum": ["GENERAL", "MED", "SOCIAL", "EVENTS", "CONFERENCE", "PERSONAL"]
+          },
+          createdAt: "24-12-2025",
+          updatedAt: "24-12-2025",
+        }
+      ]
+    },
+    total: 1
+  },
+  NewsFilters: {
+    title: 'Заголовок поиска',
+    description: 'Описание поиска',
+    type: {
+      default: "GENERAL",
+      "@enum": ["GENERAL", "MED", "SOCIAL", "EVENTS", "CONFERENCE", "PERSONAL"]
+    },
+    createdAt: "24-12-2025",
+    updatedAt: "24-12-2025"
   },
   host: "localhost:8088",
   schemes: ["http"],
