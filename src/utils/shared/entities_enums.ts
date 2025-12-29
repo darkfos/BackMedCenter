@@ -6,6 +6,15 @@ export enum UserTypes {
 }
 
 export enum NewsTypes {
+  GENERAL = 'GENERAL',
+  MED = 'MED',
+  SOCIAL = 'SOCIAL',
+  EVENTS = 'EVENTS',
+  CONFERENCE = 'CONFERENCE',
+  PERSONAL = 'PERSONAL'
+}
+
+export enum NewsTranslateTypes {
   GENERAL = 'главная',
   MED = 'здоровье',
   SOCIAL = 'социальные',

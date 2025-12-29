@@ -8,7 +8,7 @@
     "watch": "tsx --watch src/index.ts",
     "start": "node dist/src/index.js",
     "build": "tsc && tsc-alias",
-    "generate": "npm run build && npx typeorm migration:generate ./src/db/migrations/$npm_config_name -d ./dist/src/db/data-source.js",
+    "generate": "npm run build && npx typeorm migration:generate ./src/db/migrations/$npm_config_name -d ./dist/src/db/data-source.js && npm run build",
     "migration": "npx typeorm migration:run -d dist/src/db/data-source.js",
     "swagger:gen": "node dist/src/utils/other/swagger.js",
     "lint": "eslint .",

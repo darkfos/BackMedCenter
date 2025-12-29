@@ -1,15 +1,15 @@
+// @ts-nocheck
+
 import {
     Entity,
     Column,
     PrimaryGeneratedColumn,
     CreateDateColumn,
     UpdateDateColumn,
-    OneToOne,
-    JoinColumn
+    JoinColumn, ManyToOne
 } from "typeorm";
 
 import { NewsTypes } from "@/utils/shared/entities_enums.js";
-import { User } from "@/module/users/entity/User.entity.js";
 
 @Entity({ name: "news" })
 export class News {
@@ -45,7 +45,7 @@ export class News {
     @UpdateDateColumn({ nullable: true })
     updateDate!: Date;
 
-    @OneToOne(() => User)
+    @ManyToOne('User', user => user.news)
     @JoinColumn()
-    user!: User;
+    user!: Record<string, any>;
 }

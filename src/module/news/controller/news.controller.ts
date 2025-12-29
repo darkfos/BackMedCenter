@@ -31,10 +31,10 @@ newsRouter.post('/create', authMiddleware, async (req: Request & JwtPayload, res
     const newsIsCreated = await NewsService.createNews(newsData, req?.token);
 
     if (newsIsCreated) {
-        return res.status(201).send({ message: 'Новость была создана' });
+        return res.status(201).send({ description: 'Новость была создана' });
     }
 
-    return res.status(400).send({ message: 'Не удалось создать новость' });
+    return res.status(400).send({ description: 'Не удалось создать новость' });
 });
 
 newsRouter.delete("/delete", authMiddleware, async (req: Request & JwtPayload, res: Response) => {
@@ -67,8 +67,53 @@ newsRouter.delete("/delete", authMiddleware, async (req: Request & JwtPayload, r
     const newsIsDeleted = await NewsService.deleteNews(Number(id), req?.token);
 
     if (newsIsDeleted) {
-        return res.status(200).send({ message: 'Новость была удалена'});
+        return res.status(200).send({ description: 'Новость была удалена'});
     }
 
-    return res.status(400).send({ message: 'Не удалось удалить новость' });
+    return res.status(400).send({ description: 'Не удалось удалить новость' });
+});
+
+newsRouter.post("/create", authMiddleware, async (req: Request & JwtPayload, res: Response) => {
+    /*
+        #swagger.method = 'POST'
+        #swagger.tags = ['News']
+        #swagger.summary = 'Создание новости'
+        #swagger.description = 'Создание новости по выбранной теме'
+        #swagger.produces = ['application/json']
+        #swagger.consumes = ['application/json']
+
+        #swagger.parameters['body'] = {
+          in: 'body',
+          description: 'Данные новой новости',
+          required: true,
+          schema: {
+              $ref: '#/definitions/CreateNews'
+          }
+        }
+
+        #swagger.responses[201] = {
+            description: 'Новость была создана',
+            schema: {
+                $ref: '#/definitions/Message'
+            }
+        }
+        #swagger.responses[400] = {
+            description: 'Не удалось создать новость',
+            $ref: '#/definitions/Message'
+        }
+    */
+
+    const newsIsCreated = await NewsService.createNews(req.body as News, req?.token);
+
+    if (newsIsCreated) {
+        return res.status(201).send({
+            description: 'Новость была создана'
+        })
+    }
+
+    return res.status(400).send(
+        {
+            description: 'Не удалось создать новость'
+        }
+    )
 })

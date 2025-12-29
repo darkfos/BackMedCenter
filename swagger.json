@@ -191,28 +191,34 @@
           "News"
         ],
         "summary": "Создание новости",
-        "description": "Создание новой новости администратором",
+        "description": "Создание новости по выбранной теме",
         "consumes": [
           "application/json"
         ],
         "produces": [
           "application/json"
         ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Пользовательские данные для авторизации",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateNews"
+            }
+          }
+        ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Новость была создана",
             "schema": {
               "$ref": "#/definitions/Message"
             }
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
             "description": "Не удалось создать новость",
-            "schema": {
-              "$ref": "#/definitions/Message"
-            }
+            "$ref": "#/definitions/Message"
           },
           "401": {
             "description": "Unauthorized"
@@ -326,13 +332,13 @@
           "example": "24-12-2025"
         },
         "userType": {
-          "default": "doctor",
+          "default": "DOCTOR",
           "type": "string",
           "enum": [
-            "doctor",
-            "pacient",
-            "register",
-            "manager"
+            "DOCTOR",
+            "PACIENT",
+            "REGISTER",
+            "MANAGER"
           ]
         }
       }
@@ -341,6 +347,31 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/User"
+      }
+    },
+    "CreateNews": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Заголовок новости"
+        },
+        "description": {
+          "type": "string",
+          "example": "Описание новости"
+        },
+        "type": {
+          "default": "GENERAL",
+          "type": "string",
+          "enum": [
+            "GENERAL",
+            "MED",
+            "SOCIAL",
+            "EVENTS",
+            "CONFERENCE",
+            "PERSONAL"
+          ]
+        }
       }
     }
   }

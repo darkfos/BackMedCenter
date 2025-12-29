@@ -47,8 +47,8 @@ const doc = {
       createdAt: "24-12-2025",
       updatedAt: "24-12-2025",
       userType: {
-        default: "doctor",
-        "@enum": ["doctor", "pacient", "register", "manager"],
+        default: "DOCTOR",
+        "@enum": ["DOCTOR", "PACIENT", "REGISTER", "MANAGER"],
       },
     },
     Users: [
@@ -56,6 +56,14 @@ const doc = {
         $ref: "#/definitions/User",
       },
     ],
+    CreateNews: {
+      title: 'Заголовок новости',
+      description: 'Описание новости',
+      type: {
+        default: "GENERAL",
+        "@enum": ["GENERAL", "MED", "SOCIAL", "EVENTS", "CONFERENCE", "PERSONAL"]
+      }
+    }
   },
   host: "localhost:8088",
   schemes: ["http"],

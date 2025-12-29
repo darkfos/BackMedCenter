@@ -3,10 +3,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  UpdateDateColumn, OneToMany,
 } from "typeorm";
 
 import { UserTypes } from "@/utils/shared/entities_enums.js";
+import {News} from "@/module/news/entity/News.entity.js";
 
 @Entity({ name: "users" })
 export class User {
@@ -38,4 +39,7 @@ export class User {
 
   @Column({ type: "enum", enum: UserTypes, default: UserTypes.PACIENT })
   userType!: UserTypes;
+
+  @OneToMany(() => News, (news) => news.user)
+  news!: Array<News>
 }

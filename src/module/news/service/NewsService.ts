@@ -13,8 +13,7 @@ export class NewsService {
         const user = await AuthService.userIsAdmin(userData.email) as User;
 
         if (user && user?.isAdmin) {
-            news.userid = user.id;
-            await this.repository.create(news);
+            (news as NewsTable).user = user;
             await this.repository.save(news);
             return news;
         }
