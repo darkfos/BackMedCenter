@@ -48,6 +48,55 @@
         }
       }
     },
+    "/update-password": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Обновление пароля",
+        "description": "Обновление пароля пользователя",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Получение нового пароля",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "new_password": {
+                  "type": "string",
+                  "example": "Новый пароль"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пароль успешно обновлен",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось обновить пароль",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/create": {
       "post": {
         "tags": [
@@ -419,10 +468,6 @@
         "email": {
           "type": "string",
           "example": "test@mail.ru"
-        },
-        "password": {
-          "type": "string",
-          "example": "secret-password"
         },
         "fullName": {
           "type": "string",

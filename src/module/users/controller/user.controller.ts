@@ -37,3 +37,49 @@ userRouter.get('/info', authMiddleware, async (req: Request & JwtPayload, res: R
         message: 'Пользователь не найден'
     })
 });
+
+userRouter.patch('/update-password', authMiddleware, async (req: Request & JwtPayload, res: Response) => {
+    /*
+        #swagger.method = 'PATCH'
+        #swagger.tags = ['Users']
+        #swagger.summary = 'Обновление пароля'
+        #swagger.description = 'Обновление пароля пользователя'
+        #swagger.produces = ['application/json']
+        #swagger.consumes = ['application/json']
+
+        #swagger.parameters['body'] = {
+            in: 'body',
+            description: 'Получение нового пароля',
+            required: true,
+            schema: {
+                new_password: 'Новый пароль'
+            }
+        }
+
+        #swagger.responses[200] = {
+            description: 'Пароль успешно обновлен',
+            schema: {
+                $ref: '#/definitions/Message'
+            }
+        }
+        #swagger.responses[400] = {
+            description: 'Не удалось обновить пароль',
+            schema: {
+                $ref: '#/definitions/Message'
+            }
+        }
+    */
+
+    const { new_password } = req.body;
+    const passwordIsUpdated = await UserService.updatePassword(req?.token?.email, new_password);
+
+    if (passwordIsUpdated) {
+        return res.status(200).json({
+            message: 'Пароль успешно обновлен'
+        })
+    }
+
+    return res.status(400).json({
+        message: 'Не удалось обновить пароль'
+    })
+})

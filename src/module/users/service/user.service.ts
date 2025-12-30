@@ -25,4 +25,17 @@ export class UserService {
         Object.entries(user as User).filter(([key, value]) => !['password'].includes(key))
     );
   }
+
+  static async updatePassword(email: string, newPassword: string) {
+    const hashedPassword = await hashPassword(newPassword);
+    const user = await this.repository.findOne({ where: { email } });
+
+    if (user) {
+      user.password = hashedPassword;
+      await this.repository.save(user);
+      return true;
+    }
+
+    return false;
+  }
 }
