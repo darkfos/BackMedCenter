@@ -21,166 +21,29 @@
     "http"
   ],
   "paths": {
-    "/register": {
-      "post": {
+    "/info": {
+      "get": {
         "tags": [
-          "Auth"
+          "Users"
         ],
-        "summary": "Регистрация пользователя",
-        "description": "Регистрация пользователя",
+        "summary": "Получение информации о пользователе",
+        "description": "Получение полной информации о пользователе",
         "consumes": [
-          "application/json"
+          "applicaiton/json"
         ],
         "produces": [
           "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "Пользовательские данные для регистрации",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/AuthUserData"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Пользователь был зарегистрирован",
-            "schema": {
-              "$ref": "#/definitions/Message"
-            }
-          },
-          "400": {
-            "description": "Не удалось зарегистрировать пользователя",
-            "schema": {
-              "$ref": "#/definitions/Message"
-            }
-          }
-        }
-      }
-    },
-    "/login": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Авторизация пользователя",
-        "description": "Авторизация пользователя с получением токенов",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "Пользовательские данные для авторизации",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/AuthUserData"
-            }
-          }
         ],
         "responses": {
           "200": {
-            "description": "Пользователь был успешно авторизован",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "refs": {
-                  "type": "string",
-                  "example": "#/definitions/TokensData"
-                }
-              },
-              "required": [
-                "refs"
-              ],
-              "xml": {
-                "name": "main"
-              }
-            }
+            "description": "OK",
+            "$ref": "#/definitions/User"
           },
           "401": {
-            "description": "Не удалось аутентифицировать пользователя",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "refs": {
-                  "type": "string",
-                  "example": "#/definitions/Message"
-                }
-              },
-              "required": [
-                "refs"
-              ],
-              "xml": {
-                "name": "main"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/me": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Проверка аутентифицированного пользователя",
-        "description": "Проверка аутентифицированного пользователя путем декодирования токена",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Пользователь был аутентифицирован",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "refs": {
-                  "type": "string",
-                  "example": "#/definitions/VerifyUser"
-                }
-              },
-              "required": [
-                "refs"
-              ],
-              "xml": {
-                "name": "main"
-              }
-            }
+            "description": "Unauthorized"
           },
-          "401": {
-            "description": "Пользователь не прошел аутентификацию",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "refs": {
-                  "type": "string",
-                  "example": "#/definitions/VerifyUser"
-                }
-              },
-              "required": [
-                "refs"
-              ],
-              "xml": {
-                "name": "main"
-              }
-            }
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -345,6 +208,170 @@
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Регистрация пользователя",
+        "description": "Регистрация пользователя",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Пользовательские данные для регистрации",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthUserData"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Пользователь был зарегистрирован",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось зарегистрировать пользователя",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Авторизация пользователя",
+        "description": "Авторизация пользователя с получением токенов",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Пользовательские данные для авторизации",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthUserData"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь был успешно авторизован",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refs": {
+                  "type": "string",
+                  "example": "#/definitions/TokensData"
+                }
+              },
+              "required": [
+                "refs"
+              ],
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Не удалось аутентифицировать пользователя",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refs": {
+                  "type": "string",
+                  "example": "#/definitions/Message"
+                }
+              },
+              "required": [
+                "refs"
+              ],
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Проверка аутентифицированного пользователя",
+        "description": "Проверка аутентифицированного пользователя путем декодирования токена",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь был аутентифицирован",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refs": {
+                  "type": "string",
+                  "example": "#/definitions/VerifyUser"
+                }
+              },
+              "required": [
+                "refs"
+              ],
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не прошел аутентификацию",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refs": {
+                  "type": "string",
+                  "example": "#/definitions/VerifyUser"
+                }
+              },
+              "required": [
+                "refs"
+              ],
+              "xml": {
+                "name": "main"
+              }
+            }
           }
         }
       }

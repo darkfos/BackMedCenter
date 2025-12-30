@@ -20,6 +20,9 @@ export class UserService {
 
   static async getUserByEmail(email: string) {
     const user = await this.repository.findOne({ where: { email } });
-    return user;
+
+    return Object.fromEntries(
+        Object.entries(user as User).filter(([key, value]) => !['password'].includes(key))
+    );
   }
 }

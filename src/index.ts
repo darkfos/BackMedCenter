@@ -5,9 +5,11 @@ import { createRequire } from "node:module";
 
 import { apiConfig } from "@/conf/apiConfig.js";
 import { dbSource } from "@/db/data-source.js";
+import {postAuthMiddleware} from "@/utils/middlewares/authMiddleware.js";
+
 import { authRouter } from "@/module/auth/controller/auth.controller.js";
 import { newsRouter } from "@/module/news/controller/news.controller.js";
-import {postAuthMiddleware} from "@/utils/middlewares/authMiddleware.js";
+import { userRouter } from "@/module/users/controller/user.controller.js";
 
 const require = createRequire(import.meta.url);
 const app = express();
@@ -22,6 +24,7 @@ app.use(
 // Router's
 app.use("/auth", authRouter);
 app.use('/news', newsRouter);
+app.use('/users', userRouter);
 
 // Post middlewarees
 app.use(postAuthMiddleware);

@@ -41,7 +41,6 @@ const doc = {
     User: {
       id: "1",
       email: "test@mail.ru",
-      password: "secret-password",
       fullName: "user",
       isAdmin: false,
       createdAt: "24-12-2025",

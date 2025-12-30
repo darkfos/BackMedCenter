@@ -1,7 +1,6 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
-import {UpdateResult} from "typeorm";
 
 import {News, NewsFilter} from "@/module/news/dto/News.dto.js";
 import { NewsService } from "@/module/news/service/NewsService.js";
