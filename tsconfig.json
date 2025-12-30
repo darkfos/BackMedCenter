@@ -2,17 +2,18 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    "rootDir": ".",
+    "rootDir": "src",
+    "baseUrl": "src",
     "outDir": "./dist",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
+    "moduleResolution": "Node",
+    "module": "CommonJS",
     "target": "ES2022",
     "types": ["node"],
     // For nodejs:
-    "lib": ["esnext"],
+    "lib": ["es2022"],
 
     // Other Outputs
     "sourceMap": true,
@@ -41,10 +42,12 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "@/conf/*": ["./conf/*"],
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]
     }
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

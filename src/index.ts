@@ -1,19 +1,17 @@
 import express from "express";
 import swaggerUI from "swagger-ui-express";
 import { join, resolve } from "node:path";
-import { createRequire } from "node:module";
 
 import { apiConfig } from "@/conf/apiConfig.js";
 import { dbSource } from "@/db/data-source.js";
-import {postAuthMiddleware} from "@/utils/middlewares/authMiddleware.js";
+import {postAuthMiddleware} from "@/utils";
 
-import { authRouter } from "@/module/auth/controller/auth.controller.js";
-import { newsRouter } from "@/module/news/controller/news.controller.js";
-import { userRouter } from "@/module/users/controller/user.controller.js";
-import { pacientsRouter } from "@/module/pacients/controller/pacients.controller.js";
-import { analysRouter } from "@/module/analysis/controller/analys.controller.js";
+import { authRouter } from "@/module/auth";
+import { newsRouter } from "@/module/news";
+import { userRouter } from "@/module/users";
+import { pacientsRouter } from "@/module/pacients";
+import { analysRouter } from "@/module/analysis";
 
-const require = createRequire(import.meta.url);
 const app = express();
 
 app.use(express.json());

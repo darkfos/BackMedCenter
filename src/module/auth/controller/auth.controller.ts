@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
 
-import { UserService } from "@/module/users/service/user.service.js";
-import { RegUserInfo } from "@/module/auth/dto/Auth.dto.js";
-import { AuthService } from "@/module/auth/service/AuthService.js";
+import { UserService } from "@/module/users";
+import { RegUserInfo } from "@/module/auth";
+import { AuthService } from "@/module/auth";
 
 export const authRouter = Router();
 

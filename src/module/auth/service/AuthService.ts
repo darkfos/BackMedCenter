@@ -1,9 +1,9 @@
 import { dbSource } from "@/db/data-source.js";
 
-import { RegUserInfo } from "@/module/auth/dto/Auth.dto.js";
-import { User } from "@/module/users/entity/User.entity.js";
-import { verifyPassword } from "@/utils/other/hash_password.js";
-import { generateToken, TokenType, verifyToken } from "@/utils/other/jwt.js";
+import { RegUserInfo } from "@/module/auth";
+import { User } from "@/module/users";
+import { verifyPassword } from "@/utils";
+import { generateToken, TokenType, verifyToken } from "@/utils";
 
 export class AuthService {
   private static repository = dbSource.getRepository(User);

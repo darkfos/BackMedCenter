@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 
-import { verifyToken, generateToken } from "@/utils/other/jwt.js";
+import { verifyToken, generateToken } from "@/utils";
 
 export async function authMiddleware(req: Request & JwtPayload, res: Response, next: NextFunction) {
 

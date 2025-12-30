@@ -2,9 +2,9 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 
-import {News, NewsFilter} from "@/module/news/dto/News.dto.js";
-import { NewsService } from "@/module/news/service/NewsService.js";
-import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
+import {News, NewsFilter} from "@/module/news";
+import { NewsService } from "@/module/news";
+import { authMiddleware } from "@/utils";
 
 export const newsRouter = Router();
 

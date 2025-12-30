@@ -9,7 +9,7 @@ import {
     JoinColumn, ManyToOne
 } from "typeorm";
 
-import { NewsTypes } from "@/utils/shared/entities_enums.js";
+import { NewsTypes } from "@/utils";
 
 @Entity({ name: "news" })
 export class News {

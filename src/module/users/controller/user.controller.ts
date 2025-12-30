@@ -1,8 +1,8 @@
 import { Router, Request, Response } from "express";
-
-import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
-import {UserService} from "@/module/users/service/user.service.js";
 import {JwtPayload} from "jsonwebtoken";
+
+import { authMiddleware } from "@/utils/";
+import {UserService} from "@/module/users";
 
 export const userRouter = Router();
 

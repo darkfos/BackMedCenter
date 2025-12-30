@@ -1,11 +1,11 @@
 import { FindOptionsWhere, ILike } from "typeorm";
 
 import { dbSource } from "@/db/data-source.js";
-import { News as NewsTable } from "@/module/news/entity/News.entity.js";
+import { News as NewsTable } from "@/module/news";
 
-import type {News, NewsFilter} from "@/module/news/dto/News.dto.js";
-import { User } from "@/module/users/entity/User.entity.js";
-import { AuthService } from "@/module/auth/service/AuthService.js";
+import type {News, NewsFilter} from "@/module/news";
+import { User } from "@/module/users";
+import { AuthService } from "@/module/auth";
 
 export class NewsService {
 

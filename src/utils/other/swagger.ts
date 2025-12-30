@@ -1,12 +1,12 @@
 import swaggerAutogen from "swagger-autogen";
-import { fileURLToPath } from "node:url";
 import * as path from "node:path";
+
+import { fileURLToPath } from "node:url";
 import { glob } from "glob";
 import { join, resolve } from "node:path";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outputFile = path.join(__dirname, "..", "..", "..", "..", "swagger.json");
-const endpointsFiles = await glob(
+const endpointsFiles = glob(
   join(resolve() as string, "dist/src/module/*/controller/*.js"),
   // @ts-ignore
   () => {},

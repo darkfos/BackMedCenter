@@ -1,5 +1,5 @@
-import { UserTypes } from "@/utils/shared/entities_enums.js";
-import { RegUserInfo } from "@/module/auth/dto/Auth.dto.js";
+import { UserTypes } from "@/utils";
+import { RegUserInfo } from "@/module/auth";
 
 export interface UserInfo extends RegUserInfo {
   fullName: string;

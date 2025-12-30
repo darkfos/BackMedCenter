@@ -6,10 +6,10 @@ import {
   UpdateDateColumn, OneToMany,
 } from "typeorm";
 
-import { UserTypes } from "@/utils/shared/entities_enums.js";
-import {News} from "@/module/news/entity/News.entity.js";
-import {Pacients} from "@/module/pacients/entity/Pacients.entity.js";
-import { Analyses } from "@/module/analysis/entity/Analys.entity.js";
+import { UserTypes } from "@/utils";
+import {News} from "@/module/news";
+import {Pacients} from "@/module/pacients";
+import { Analyses } from "@/module/analysis";
 
 @Entity({ name: "users" })
 export class User {
