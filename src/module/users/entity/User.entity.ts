@@ -9,6 +9,7 @@ import {
 import { UserTypes } from "@/utils/shared/entities_enums.js";
 import {News} from "@/module/news/entity/News.entity.js";
 import {Pacients} from "@/module/pacients/entity/Pacients.entity.js";
+import { Analyses } from "@/module/analysis/entity/Analys.entity.js";
 
 @Entity({ name: "users" })
 export class User {
@@ -49,4 +50,10 @@ export class User {
 
   @OneToMany(() => Pacients, pacient => pacient.doctor)
   doctors!: Array<Pacients>;
+
+  @OneToMany(() => Analyses, analys => analys.user)
+  pacientAnalyses!: Array<Analyses>;
+
+  @OneToMany(() => Analyses, analys => analys.doctor)
+  doctorAnalysis!: Array<Analyses>;
 }
