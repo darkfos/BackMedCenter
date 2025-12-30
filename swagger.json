@@ -39,9 +39,6 @@
             "description": "OK",
             "$ref": "#/definitions/User"
           },
-          "401": {
-            "description": "Unauthorized"
-          },
           "404": {
             "description": "Not Found"
           }
@@ -90,9 +87,6 @@
             "schema": {
               "$ref": "#/definitions/Message"
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -117,17 +111,11 @@
               "$ref": "#/definitions/Message"
             }
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
             "description": "Не удалось создать новость",
             "schema": {
               "$ref": "#/definitions/Message"
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -158,16 +146,16 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
             "schema": {
               "$ref": "#/definitions/NewsList"
-            }
+            },
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/List"
-            }
+            },
+            "description": "Bad Request"
           }
         }
       }
@@ -186,11 +174,6 @@
           "application/json"
         ],
         "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "type": "string"
-          },
           {
             "name": "body",
             "in": "body",
@@ -213,9 +196,6 @@
             "schema": {
               "$ref": "#/definitions/Message"
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -254,9 +234,6 @@
             "schema": {
               "$ref": "#/definitions/Message"
             }
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }

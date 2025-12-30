@@ -5,150 +5,181 @@ import { JwtPayload } from "jsonwebtoken";
 import {News, NewsFilter} from "@/module/news";
 import { NewsService } from "@/module/news";
 import { authMiddleware } from "@/utils";
+import redisClient from "@/utils/cache/redis";
 
-export const newsRouter = Router();
+class NewsController {
 
-newsRouter.post('/create', authMiddleware, async (req: Request & JwtPayload, res: Response) => {
-    /*
-        #swagger.method = 'POST'
-        #swagger.tags = ['News']
-        #swagger.summary = 'Создание новости'
-        #swagger.description = 'Создание новой новости администратором'
-        #swagger.produces = ['application/json']
-        #swagger.consumes = ['application/json']
+    router: Router;
 
-        #swagger.responses[200] = {
-            description: 'Новость была создана',
-            schema: { $ref: '#/definitions/Message' }
-        }
-        #swagger.responses[400] = {
-            description: 'Не удалось создать новость',
-            schema: { $ref: '#/definitions/Message' }
-        }
-    */
-
-    const newsData: News = req.body;
-    const newsIsCreated = await NewsService.createNews(newsData, req?.token);
-
-    if (newsIsCreated) {
-        return res.status(201).send({ description: 'Новость была создана' });
+    constructor() {
+        this.router = Router();
+        this.initPaths();
     }
 
-    return res.status(400).send({ description: 'Не удалось создать новость' });
-});
+    public initPaths() {
+        newsController.router.post('/create', authMiddleware, async (req, res) => {
+            /*
+                #swagger.method = 'POST'
+                #swagger.tags = ['News']
+                #swagger.summary = 'Создание новости'
+                #swagger.description = 'Создание новой новости администратором'
+                #swagger.produces = ['application/json']
+                #swagger.consumes = ['application/json']
 
-newsRouter.get('/list', async (req: Request & JwtPayload, res: Response) => {
-    /*
-        #swagger.method = 'GET'
-        #swagger.tags = ['News']
-        #swagger.summary = 'Список новостей'
-        #swagger.description = 'Получения списка новостей по фильтрам'
-        #swagger.produces = ['application/json']
-        #swagger.consumes = ['application/json']
+                #swagger.responses[200] = {
+                    description: 'Новость была создана',
+                    schema: { $ref: '#/definitions/Message' }
+                }
+                #swagger.responses[400] = {
+                    description: 'Не удалось создать новость',
+                    schema: { $ref: '#/definitions/Message' }
+                }
+            */
 
-        #swagger.parameters['body'] = {
-            in: 'body',
-            description: 'Фильтры доя получения новостей',
-            required: false,
-            schema: {
-                $ref: '#/definitions/NewsFilters'
-            }
-        }
+            return NewsController.create(req, res);
+        });
 
-        #swagger.responses[200] = {
-            schema: {
-                $ref: '#/definitions/NewsList'
-            }
-        }
-        #swagger.responses[400] = {
-            schema: {
-                $ref: '#/definitions/List'
-            }
-        }
-    */
-    const news = await NewsService.getAll(req.body ?? {} as NewsFilter);
+        newsController.router.get('/list', (req, res) => {
+            /*
+                #swagger.method = 'GET'
+                #swagger.tags = ['News']
+                #swagger.summary = 'Список новостей'
+                #swagger.description = 'Получения списка новостей по фильтрам'
+                #swagger.produces = ['application/json']
+                #swagger.consumes = ['application/json']
 
-    if (news[0].length) {
-        return res.status(200).json({list: news[0], total: news[1]});
+                #swagger.parameters['body'] = {
+                    in: 'body',
+                    description: 'Фильтры доя получения новостей',
+                    required: false,
+                    schema: {
+                        $ref: '#/definitions/NewsFilters'
+                    }
+                }
+
+                #swagger.responses[200] = {
+                    schema: {
+                        $ref: '#/definitions/NewsList'
+                    }
+                }
+                #swagger.responses[400] = {
+                    schema: {
+                        $ref: '#/definitions/List'
+                    }
+                }
+            */
+
+            return NewsController.list(req, res);
+        });
+        newsController.router.put('/update', authMiddleware, (req, res) => {
+            /*
+                #swagger.method = 'PUT'
+                #swagger.tags = ['News']
+                #swagger.summary = 'Обновление информации по новости'
+                #swagger.description = 'Частичное или полное обновление информации по новосте'
+                #swagger.produces = ['application/json']
+                #swagger.consumes = ['application/json']
+
+                #swagger.parameters['body'] = {
+                    in: 'body',
+                    description: 'Поля под обновление',
+                    required: false,
+                    schema: {
+                        $ref: '#/definitions/NewsFilters'
+                    }
+                }
+
+                #swagger.responses[200] = {
+                    description: 'Информация о новосте была обновлена',
+                    schema: {
+                        $ref: '#/definitions/Message'
+                    }
+                }
+                #swagger.responses[400] = {
+                    description: 'Не удалось обновить информацию по новости',
+                    schema: {
+                        $ref: '#/definitions/Message'
+                    }
+                }
+            */
+
+            return NewsController.update(req, res);
+        });
+        newsController.router.delete("/delete", authMiddleware, (req, res) => {
+
+            /*
+                #swagger.method = 'DELETE'
+                #swagger.tags = ['News']
+                #swagger.summary = 'Удаление новости'
+                #swagger.description = 'Удаление новости администратором'
+                #swagger.produces = ['application/json']
+                #swagger.consumes = ['application/json']
+
+                #swagger.parameters['id'] = {
+                    in: 'query',
+                    description: 'Идентификатор новости',
+                    required: true,
+                    type: 'integer'
+                }
+
+                #swagger.responses[200] = {
+                    description: 'Новость была удалена',
+                    schema: { $ref: '#/definitions/Message' }
+                }
+                #swagger.responses[400] = {
+                    description: 'Не удалось удалить новость',
+                    schema: { $ref: '#/definitions/Message' }
+                }
+            */
+
+            return NewsController.delete(req, res);
+        });
     }
 
-    return res.status(400).json({list: [], total: 0});
-});
+    static async create(req: Request & JwtPayload, res: Response) {
+        const newsData: News = req.body;
+        const newsIsCreated = await NewsService.createNews(newsData, req?.token);
 
-newsRouter.put('/update', authMiddleware, async (req: Request & JwtPayload, res: Response) => {
-    /*
-        #swagger.method = 'PUT'
-        #swagger.tags = ['News']
-        #swagger.summary = 'Обновление информации по новости'
-        #swagger.description = 'Частичное или полное обновление информации по новосте'
-        #swagger.produces = ['application/json']
-        #swagger.consumes = ['application/json']
-
-        #swagger.parameters['body'] = {
-            in: 'body',
-            description: 'Поля под обновление',
-            required: false,
-            schema: {
-                $ref: '#/definitions/NewsFilters'
-            }
+        if (newsIsCreated) {
+            return res.status(201).send({ description: 'Новость была создана' });
         }
 
-        #swagger.responses[200] = {
-            description: 'Информация о новосте была обновлена',
-            schema: {
-                $ref: '#/definitions/Message'
-            }
-        }
-        #swagger.responses[400] = {
-            description: 'Не удалось обновить информацию по новости',
-            schema: {
-                $ref: '#/definitions/Message'
-            }
-        }
-    */
-
-    const { id } = req.query;
-    const newsIsUpdated = await NewsService.updateNews(Number(id), req.body as NewsFilter);
-
-    if (!newsIsUpdated) {
-        return res.status(400).json({description: 'Не удалось обновить информацию по новости'})
+        return res.status(400).send({ description: 'Не удалось создать новость' });
     }
 
-    return res.status(200).json({description: 'Информация о новосте была обновлена'});
-});
+    static async list(req: Request & JwtPayload, res: Response) {
+        const news = await NewsService.getAll(req.body ?? {} as NewsFilter);
 
-newsRouter.delete("/delete", authMiddleware, async (req: Request & JwtPayload, res: Response) => {
-    /*
-        #swagger.method = 'DELETE'
-        #swagger.tags = ['News']
-        #swagger.summary = 'Удаление новости'
-        #swagger.description = 'Удаление новости администратором'
-        #swagger.produces = ['application/json']
-        #swagger.consumes = ['application/json']
-
-        #swagger.parameters['id'] = {
-            in: 'query',
-            description: 'Идентификатор новости',
-            required: true,
-            type: 'integer'
+        if (news[0].length) {
+            return res.status(200).json({list: news[0], total: news[1]});
         }
 
-        #swagger.responses[200] = {
-            description: 'Новость была удалена',
-            schema: { $ref: '#/definitions/Message' }
-        }
-        #swagger.responses[400] = {
-            description: 'Не удалось удалить новость',
-            schema: { $ref: '#/definitions/Message' }
-        }
-    */
-
-    const { id } = req.query;
-    const newsIsDeleted = await NewsService.deleteNews(Number(id), req?.token);
-
-    if (newsIsDeleted) {
-        return res.status(200).send({ description: 'Новость была удалена'});
+        return res.status(400).json({list: [], total: 0});
     }
 
-    return res.status(400).send({ description: 'Не удалось удалить новость' });
-});
+    static async update(req: Request & JwtPayload, res: Response) {
+
+        const { id } = req.query;
+        const newsIsUpdated = await NewsService.updateNews(Number(id), req.body as NewsFilter);
+
+        if (!newsIsUpdated) {
+            return res.status(400).json({description: 'Не удалось обновить информацию по новости'})
+        }
+
+        return res.status(200).json({description: 'Информация о новосте была обновлена'});
+    }
+
+    static async delete(req: Request & JwtPayload, res: Response) {
+
+        const { id } = req.query;
+        const newsIsDeleted = await NewsService.deleteNews(Number(id), req?.token);
+
+        if (newsIsDeleted) {
+            return res.status(200).send({ description: 'Новость была удалена'});
+        }
+
+        return res.status(400).send({ description: 'Не удалось удалить новость' });
+    }
+}
+
+export const newsController = new NewsController();

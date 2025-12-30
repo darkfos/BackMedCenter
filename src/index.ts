@@ -7,7 +7,7 @@ import { dbSource } from "@/db/data-source.js";
 import { postAuthMiddleware } from "@/utils";
 
 import { authRouter } from "@/module/auth";
-import { newsRouter } from "@/module/news";
+import { newsController } from "@/module/news";
 import { userRouter } from "@/module/users";
 import { pacientsRouter } from "@/module/pacients";
 import { analysRouter } from "@/module/analysis";
@@ -23,7 +23,7 @@ app.use(
 
 // Router's
 app.use("/auth", authRouter);
-app.use('/news', newsRouter);
+app.use('/news', newsController.router);
 app.use('/users', userRouter);
 app.use('/analys', analysRouter);
 app.use('/pacients', pacientsRouter);
