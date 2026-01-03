@@ -5,6 +5,11 @@ export enum UserTypes {
   MANAGER = "manager",
 }
 
+export enum FormatWorks {
+  'OCH' = "och",
+  'ZOCH' = "zoch"
+}
+
 export enum NewsTypes {
   GENERAL = "GENERAL",
   MED = "MED",

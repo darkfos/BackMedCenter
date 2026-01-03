@@ -7,7 +7,7 @@ import {
   OneToMany, ManyToMany, ManyToOne, JoinColumn,
 } from "typeorm";
 
-import { UserTypes } from "@/utils";
+import { UserTypes, FormatWorks } from "@/utils";
 import { News } from "@/module/news";
 import { Pacients } from "@/module/pacients";
 import { Analyses } from "@/module/analysis";
@@ -61,6 +61,9 @@ export class User {
 
   @Column({ type: "text", nullable: true, default: null })
   avatar!: string;
+
+  @Column({ type: "enum", enum: FormatWorks, default: FormatWorks.OCH })
+  formatWork!: FormatWorks;
 
   @OneToMany(() => News, (news) => news.user)
   news!: Array<News>;
