@@ -15,6 +15,7 @@ import { analysisController } from "@/module/analysis";
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(
   "/api-docs",
   swaggerUI.serve,

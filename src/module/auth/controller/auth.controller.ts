@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 
+import { uploadImage } from "@/utils/fileManager/storage";
 import { UserService } from "@/module/users";
 import { RegUserInfo } from "@/module/auth";
 import { AuthService } from "@/module/auth";
@@ -13,7 +14,7 @@ class AuthController {
   }
 
   initRoutes(): void {
-    this.router.post("/register", (req, res) => {
+    this.router.post("/register", uploadImage, (req, res) => {
       /*
         #swagger.method = 'post'
         #swagger.tags = ['Auth']
@@ -97,7 +98,8 @@ class AuthController {
   }
 
   static async register(req: Request, res: Response) {
-    const userData: RegUserInfo = req.body;
+    const userData: RegUserInfo = { ...req.body, avatar: req.file?.filename ?? "" };
+
     const newUser = await UserService.createUser(userData);
     if (newUser) {
       return res

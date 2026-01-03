@@ -1,0 +1,591 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "MedCenter Back",
+    "description": "API for MedCenter",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8088",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Модуль авторизации-аутентификации"
+    },
+    {
+      "name": "User",
+      "description": "Модуль пользователей"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/info": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Получение информации о пользователе",
+        "description": "Получение полной информации о пользователе",
+        "consumes": [
+          "applicaiton/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/definitions/User",
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/update-password": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Обновление пароля",
+        "description": "Обновление пароля пользователя",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Получение нового пароля",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "new_password": {
+                  "type": "string",
+                  "example": "Новый пароль"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пароль успешно обновлен",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось обновить пароль",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      }
+    },
+    "/create": {
+      "post": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Создание новости",
+        "description": "Создание новой новости администратором",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Новость была создана",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось создать новость",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      }
+    },
+    "/list": {
+      "get": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Список новостей",
+        "description": "Получения списка новостей по фильтрам",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Фильтры доя получения новостей",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/NewsFilters"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/NewsList"
+            },
+            "description": "OK"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/List"
+            },
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/update": {
+      "put": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Обновление информации по новости",
+        "description": "Частичное или полное обновление информации по новосте",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Поля под обновление",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/NewsFilters"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация о новосте была обновлена",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось обновить информацию по новости",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      }
+    },
+    "/delete": {
+      "delete": {
+        "tags": [
+          "News"
+        ],
+        "summary": "Удаление новости",
+        "description": "Удаление новости администратором",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор новости",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Новость была удалена",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось удалить новость",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Регистрация пользователя",
+        "description": "Регистрация пользователя",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Пользовательские данные для регистрации",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthUserData"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Пользователь был зарегистрирован",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось зарегистрировать пользователя",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Авторизация пользователя",
+        "description": "Авторизация пользователя с получением токенов",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Пользовательские данные для авторизации",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthUserData"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь был успешно авторизован",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refs": {
+                  "type": "string",
+                  "example": "#/definitions/TokensData"
+                }
+              },
+              "required": [
+                "refs"
+              ],
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Не удалось аутентифицировать пользователя",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refs": {
+                  "type": "string",
+                  "example": "#/definitions/Message"
+                }
+              },
+              "required": [
+                "refs"
+              ],
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Проверка аутентифицированного пользователя",
+        "description": "Проверка аутентифицированного пользователя путем декодирования токена",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь был аутентифицирован",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refs": {
+                  "type": "string",
+                  "example": "#/definitions/VerifyUser"
+                }
+              },
+              "required": [
+                "refs"
+              ],
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не прошел аутентификацию",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "refs": {
+                  "type": "string",
+                  "example": "#/definitions/VerifyUser"
+                }
+              },
+              "required": [
+                "refs"
+              ],
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Message": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "Сообщение"
+        }
+      }
+    },
+    "VerifyUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "test_temail@mail.ru"
+        }
+      }
+    },
+    "AuthUserData": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "test@mail.ru"
+        },
+        "password": {
+          "type": "string",
+          "example": "test_user_password"
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "1"
+        },
+        "email": {
+          "type": "string",
+          "example": "test@mail.ru"
+        },
+        "fullName": {
+          "type": "string",
+          "example": "user"
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "example": false
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "24-12-2025"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "24-12-2025"
+        },
+        "userType": {
+          "default": "DOCTOR",
+          "type": "string",
+          "enum": [
+            "DOCTOR",
+            "PACIENT",
+            "REGISTER",
+            "MANAGER"
+          ]
+        }
+      }
+    },
+    "Users": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/User"
+      }
+    },
+    "CreateNews": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Заголовок новости"
+        },
+        "description": {
+          "type": "string",
+          "example": "Описание новости"
+        },
+        "type": {
+          "default": "GENERAL",
+          "type": "string",
+          "enum": [
+            "GENERAL",
+            "MED",
+            "SOCIAL",
+            "EVENTS",
+            "CONFERENCE",
+            "PERSONAL"
+          ]
+        }
+      }
+    },
+    "ClearList": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "total": {
+          "type": "number",
+          "example": 0
+        }
+      }
+    },
+    "NewsList": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "example": "Заголовок новости"
+              },
+              "description": {
+                "type": "string",
+                "example": "Описание новости"
+              },
+              "type": {
+                "default": "GENERAL",
+                "type": "string",
+                "enum": [
+                  "GENERAL",
+                  "MED",
+                  "SOCIAL",
+                  "EVENTS",
+                  "CONFERENCE",
+                  "PERSONAL"
+                ]
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "24-12-2025"
+              },
+              "updatedAt": {
+                "type": "string",
+                "example": "24-12-2025"
+              }
+            }
+          }
+        },
+        "total": {
+          "type": "number",
+          "example": 1
+        }
+      }
+    },
+    "NewsFilters": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Заголовок поиска"
+        },
+        "description": {
+          "type": "string",
+          "example": "Описание поиска"
+        },
+        "type": {
+          "default": "GENERAL",
+          "type": "string",
+          "enum": [
+            "GENERAL",
+            "MED",
+            "SOCIAL",
+            "EVENTS",
+            "CONFERENCE",
+            "PERSONAL"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "example": "24-12-2025"
+        },
+        "updatedAt": {
+          "type": "string",
+          "example": "24-12-2025"
+        }
+      }
+    }
+  }
+}

@@ -43,6 +43,9 @@ export class User {
   @Column({ type: "enum", enum: UserTypes, default: UserTypes.PACIENT })
   userType!: UserTypes;
 
+  @Column({ type: "text", nullable: true, default: null })
+  avatar!: string;
+
   @OneToMany(() => News, (news) => news.user)
   news!: Array<News>;
 
