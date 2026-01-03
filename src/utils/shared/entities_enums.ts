@@ -5,17 +5,6 @@ export enum UserTypes {
   MANAGER = "manager",
 }
 
-export enum ClinicTypes {
-  THERAPY = 'therapy',
-  NEUROLOGY = 'neurology',
-  ORTHOPEDICS = 'orthopedics',
-  OPHTHALMOLOGY = 'ophthalmology',
-  DENTISTRY = 'dentistry',
-  PEDIATRICS = 'pediatrics',
-  DIAGNOSTICS = 'diagnostics',
-  OTHER = 'other'
-}
-
 export enum NewsTypes {
   GENERAL = "GENERAL",
   MED = "MED",

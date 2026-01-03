@@ -4,15 +4,15 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany, ManyToMany,
+  OneToMany, ManyToMany, ManyToOne, JoinColumn,
 } from "typeorm";
 
 import { UserTypes } from "@/utils";
 import { News } from "@/module/news";
 import { Pacients } from "@/module/pacients";
 import { Analyses } from "@/module/analysis";
-import { ClinicTypes } from "@/utils/shared/entities_enums";
 import { Service } from "@/module/services/entity/Service.entity";
+import { ClinicType } from "@/module/services/entity/ClinicType";
 
 @Entity({ name: "users" })
 export class User {
@@ -45,8 +45,9 @@ export class User {
   @Column({ type: "enum", enum: UserTypes, default: UserTypes.PACIENT })
   userType!: UserTypes;
 
-  @Column({ type: "enum", enum: ClinicTypes, default: ClinicTypes.OTHER, nullable: true })
-  clinicType!: ClinicTypes;
+  @ManyToOne(() => ClinicType, clinicType => clinicType.doctors)
+  @JoinColumn()
+  clinicType!: ClinicType;
 
   @Column({ type: "text", nullable: true, default: null })
   avatar!: string;

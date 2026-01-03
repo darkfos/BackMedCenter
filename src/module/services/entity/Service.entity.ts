@@ -1,8 +1,9 @@
 // @ts-nocheck
 
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable } from "typeorm";
-import { ClinicTypes } from "@/utils/shared/entities_enums";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, JoinColumn } from "typeorm";
+
 import { User } from "@/module/users";
+import { ClinicType } from "@/module/services/entity/ClinicType";
 
 @Entity({ name: "services" })
 export class Service {
@@ -25,8 +26,9 @@ export class Service {
   @Column({ type: "int", nullable: true, default: 0 })
   recDeslike!: number;
 
-  @Column({ type: "enum", enum: ClinicTypes, default: ClinicTypes.OTHER, nullable: false })
-  clinicType!: ClinicTypes;
+  @ManyToOne(() => ClinicType, (clinicType: ClinicType) => clinicType.services)
+  @JoinColumn()
+  clinicType!: ClinicType;
 
   @Column({ type: "decimal", nullable: false, default: 2500 })
   price!: number;
