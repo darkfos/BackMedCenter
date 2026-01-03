@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import express from "express";
 import swaggerUI from "swagger-ui-express";
 import { join, resolve } from "node:path";
 
@@ -20,6 +20,7 @@ app.use(
   swaggerUI.serve,
   swaggerUI.setup(require(join(resolve(), "swagger.json"))),
 );
+app.use("/static", express.static(join(__dirname, 'public')));
 
 // Router's
 app.use("/auth", authController.router);
