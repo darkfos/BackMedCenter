@@ -52,6 +52,24 @@ class ServiceController {
 
       return ServiceController.createClinic(req, res);
     });
+    this.router.get('/clinic/all', (req: Request, res: Response) => {
+      /*
+        #swagger.method = 'GET'
+        #swagger.tags = ['Clinic']
+        #swagger.summary = 'Получение всех типов услуг клиник'
+        #swagger.description = 'Получение списка всех типов услуг клиники'
+        #swagger.produces = 'application/json'
+        #swagger.consumes = 'application/json'
+
+        #swagger.responses[200] = {
+          description: 'Список всех услуг поликлиники',
+          schema: {
+            $ref: '#/definitions/ClinicList'
+          }
+        }
+      */
+      return ServiceController.listClinic(req, res);
+    })
     this.router.post('/consult/create', (req: Request, res: Response) => {
     });
     this.router.post('/review/create', (req: Request, res: Response) => {
@@ -69,6 +87,11 @@ class ServiceController {
     }
 
     return res.status(400).json({ message: 'Не удалось создать новый тип услуг' });
+  }
+
+  static async listClinic(req: Request, res: Response) {
+    const allClinics = await ClinicTypeService.all();
+    return res.status(200).json({list: allClinics[0], total: allClinics[1] });
   }
 }
 

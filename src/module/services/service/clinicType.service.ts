@@ -17,4 +17,8 @@ export class ClinicTypeService {
       return false;
     }
   }
+
+  static async all() {
+    return await this.clinicTypeRepository.findAndCount();
+  }
 }

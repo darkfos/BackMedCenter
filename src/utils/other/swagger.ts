@@ -110,6 +110,15 @@ const doc = {
       createdAt: "24-12-2025",
       updatedAt: "24-12-2025",
     },
+    ClinicList: {
+      list: [
+        {
+          name: 'Тип услуги',
+          icon: '/путь/к изображению'
+        }
+      ],
+      total: 1
+    }
   },
   host: "localhost:8088",
   schemes: ["http"],

@@ -13,7 +13,7 @@
       "description": "Модуль авторизации-аутентификации"
     },
     {
-      "name": "User",
+      "name": "Users",
       "description": "Модуль пользователей"
     }
   ],
@@ -29,7 +29,7 @@
         "summary": "Получение информации о пользователе",
         "description": "Получение полной информации о пользователе",
         "consumes": [
-          "applicaiton/json"
+          "application/json"
         ],
         "produces": [
           "application/json"
@@ -132,6 +132,29 @@
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/clinic/all": {
+      "get": {
+        "tags": [
+          "Clinic"
+        ],
+        "summary": "Получение всех типов услуг клиник",
+        "description": "Получение списка всех типов услуг клиники",
+        "consumes": [
+          200
+        ],
+        "produces": [
+          200
+        ],
+        "responses": {
+          "200": {
+            "description": "Список всех услуг поликлиники",
+            "schema": {
+              "$ref": "#/definitions/ClinicList"
+            }
           }
         }
       }
@@ -662,6 +685,31 @@
         "updatedAt": {
           "type": "string",
           "example": "24-12-2025"
+        }
+      }
+    },
+    "ClinicList": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Тип услуги"
+              },
+              "icon": {
+                "type": "string",
+                "example": "/путь/к изображению"
+              }
+            }
+          }
+        },
+        "total": {
+          "type": "number",
+          "example": 1
         }
       }
     }
