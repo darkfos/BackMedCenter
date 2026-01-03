@@ -136,7 +136,7 @@
         }
       }
     },
-    "/clinic/all": {
+    "/clinic/list": {
       "get": {
         "tags": [
           "Clinic"
@@ -144,10 +144,27 @@
         "summary": "Получение всех типов услуг клиник",
         "description": "Получение списка всех типов услуг клиники",
         "consumes": [
-          200
+          "body"
         ],
         "produces": [
-          200
+          "body"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": false,
+            "description": "Фильтры для поиска определенных услуг",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "test"
+                }
+              }
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -161,10 +178,74 @@
     },
     "/consult/create": {
       "post": {
-        "description": "",
+        "tags": [
+          "Consult"
+        ],
+        "summary": "Создание консультации",
+        "description": "Созданией консультации",
+        "consumes": [
+          "body"
+        ],
+        "produces": [
+          "body"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "Данные для создания консультации",
+            "schema": {
+              "$ref": "#/definitions/Consult"
+            }
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "201": {
+            "description": "Запрос на консультацию был отправлен",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось отправить запрос на консультацию",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      }
+    },
+    "/consult/list": {
+      "get": {
+        "tags": [
+          "Consult"
+        ],
+        "summary": "Получение всех заявок на консультации",
+        "description": "Получение списка всех заявок на консультации",
+        "consumes": [
+          "body"
+        ],
+        "produces": [
+          "body"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": false,
+            "description": "Фильтры для поиска консультаций",
+            "schema": {
+              "$ref": "#/definitions/Consult"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список всех заявок",
+            "schema": {
+              "$ref": "#/definitions/ConsultList"
+            }
           }
         }
       }
@@ -703,6 +784,52 @@
               "icon": {
                 "type": "string",
                 "example": "/путь/к изображению"
+              }
+            }
+          }
+        },
+        "total": {
+          "type": "number",
+          "example": 1
+        }
+      }
+    },
+    "Consult": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "example": "Андрей Голубцов"
+        },
+        "сomplaints": {
+          "type": "string",
+          "example": "Колики в животике"
+        },
+        "phone": {
+          "type": "string",
+          "example": "8 988 982 23 23"
+        }
+      }
+    },
+    "ConsultList": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "username": {
+                "type": "string",
+                "example": "Андрей Голубцов"
+              },
+              "сomplaints": {
+                "type": "string",
+                "example": "Колики в животике"
+              },
+              "phone": {
+                "type": "string",
+                "example": "8 988 982 23 23"
               }
             }
           }

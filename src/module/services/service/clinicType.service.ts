@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { ILike, Repository } from "typeorm";
 
 import { dbSource } from "@/db/data-source";
 import { ClinicTypeEntity } from "@/module/services";
@@ -8,7 +8,7 @@ export class ClinicTypeService {
 
   protected static clinicTypeRepository: Repository<ClinicTypeEntity> = dbSource.getRepository(ClinicTypeEntity);
 
-  static async create(data: ClinicType ) {
+  static async create(data: ClinicType) {
     try {
       const newClinicType = await this.clinicTypeRepository.create(data);
       await this.clinicTypeRepository.save(newClinicType);
@@ -18,7 +18,9 @@ export class ClinicTypeService {
     }
   }
 
-  static async all() {
-    return await this.clinicTypeRepository.findAndCount();
+  static async all(filters: Pick<ClinicType, 'name'>) {
+    return await this.clinicTypeRepository.findAndCount({ where: filters?.name ? {
+        name: ILike(`%${filters.name}%`)
+    } : {}});
   }
 }

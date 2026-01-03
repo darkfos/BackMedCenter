@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { authMiddleware } from "@/utils";
-import { ClinicType, ClinicTypeService } from "@/module/services";
+import { ClinicType, ClinicTypeService, ConsultService } from "@/module/services";
 import { uploadIcons } from "@/utils/fileManager/storage";
 import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware";
 
@@ -52,7 +52,7 @@ class ServiceController {
 
       return ServiceController.createClinic(req, res);
     });
-    this.router.get('/clinic/all', (req: Request, res: Response) => {
+    this.router.get('/clinic/list', (req: Request, res: Response) => {
       /*
         #swagger.method = 'GET'
         #swagger.tags = ['Clinic']
@@ -60,6 +60,15 @@ class ServiceController {
         #swagger.description = 'Получение списка всех типов услуг клиники'
         #swagger.produces = 'application/json'
         #swagger.consumes = 'application/json'
+
+        #swagger.parameters['body'] = {
+          in: 'body',
+          required: false,
+          description: 'Фильтры для поиска определенных услуг',
+          schema: {
+            name: 'test'
+          }
+        }
 
         #swagger.responses[200] = {
           description: 'Список всех услуг поликлиники',
@@ -70,8 +79,66 @@ class ServiceController {
       */
       return ServiceController.listClinic(req, res);
     })
-    this.router.post('/consult/create', (req: Request, res: Response) => {
+    this.router.post('/consult/create', authMiddleware, (req: Request, res: Response) => {
+      /*
+        #swagger.method = 'POST'
+        #swagger.tags = ['Consult']
+        #swagger.summary = 'Создание консультации'
+        #swagger.description = 'Созданией консультации'
+        #swagger.produces = 'application/json'
+        #swagger.consumes = 'multipart/form-data'
+
+        #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          description: 'Данные для создания консультации',
+          schema: {
+            $ref: '#/definitions/Consult'
+          }
+        }
+
+        #swagger.responses[201] = {
+          description: 'Запрос на консультацию был отправлен',
+          schema: {
+            $ref: '#/definitions/Message'
+          }
+        }
+        #swagger.responses[400] = {
+          description: 'Не удалось отправить запрос на консультацию',
+          schema: {
+            $ref: '#/definitions/Message'
+          }
+        }
+      */
+      return ServiceController.createConsult(req, res);
     });
+    this.router.get('/consult/list', isAdminMiddleware, (req: Request, res: Response) => {
+      /*
+        #swagger.method = 'GET'
+        #swagger.tags = ['Consult']
+        #swagger.summary = 'Получение всех заявок на консультации'
+        #swagger.description = 'Получение списка всех заявок на консультации'
+        #swagger.produces = 'application/json'
+        #swagger.consumes = 'application/json'
+
+        #swagger.parameters['body'] = {
+          in: 'body',
+          required: false,
+          description: 'Фильтры для поиска консультаций',
+          schema: {
+            $ref: '#/definitions/Consult'
+          }
+        }
+
+        #swagger.responses[200] = {
+          description: 'Список всех заявок',
+          schema: {
+            $ref: '#/definitions/ConsultList'
+          }
+        }
+      */
+      return ServiceController.listConsult(req, res);
+    })
     this.router.post('/review/create', (req: Request, res: Response) => {
     });
     this.router.post('/attendance/create', (req: Request, res: Response) => {
@@ -90,8 +157,23 @@ class ServiceController {
   }
 
   static async listClinic(req: Request, res: Response) {
-    const allClinics = await ClinicTypeService.all();
+    const allClinics = await ClinicTypeService.all(req.body);
     return res.status(200).json({list: allClinics[0], total: allClinics[1] });
+  }
+
+  static async createConsult(req: Request, res: Response) {
+    const consultIsCreated = await ConsultService.create(req.body);
+
+    if (consultIsCreated) {
+      return res.status(201).json({ message: 'Запрос на консультацию был отправлен' });
+    }
+
+    return res.status(400).json({ message: 'Не удалось создать запрос на консультацию' })
+  }
+
+  static async listConsult(req: Request, res: Response) {
+    const allConsults = await ConsultService.all(req.body);
+    return res.status(200).json({list: allConsults[0], total: allConsults[1] });
   }
 }
 

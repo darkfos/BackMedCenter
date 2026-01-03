@@ -17,6 +17,9 @@ export class Consult {
   @Column({ type: "text", default: "Жалобы пользователя", nullable: true })
   сomplaints!: string;
 
+  @Column({ type: "varchar", length: 25, nullable: true, default: null })
+  phone!: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 }

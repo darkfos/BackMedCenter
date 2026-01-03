@@ -8,5 +8,6 @@ export { ServService } from "./service/serv.service";
 export { ClinicTypeService } from "./service/clinicType.service";
 
 export type { ClinicType } from "./dto/ClinicType.dto"
+export type { ConsultInfo } from "./dto/Consult.dto";
 
 export { serviceController } from "./controller/Service.controller";

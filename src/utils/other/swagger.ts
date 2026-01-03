@@ -118,6 +118,21 @@ const doc = {
         }
       ],
       total: 1
+    },
+    Consult: {
+      username: 'Андрей Голубцов',
+      сomplaints: 'Колики в животике',
+      phone: '8 988 982 23 23'
+    },
+    ConsultList: {
+      list: [
+        {
+          username: 'Андрей Голубцов',
+          сomplaints: 'Колики в животике',
+          phone: '8 988 982 23 23'
+        }
+      ],
+      total: 1
     }
   },
   host: "localhost:8088",
