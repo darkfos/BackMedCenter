@@ -26,6 +26,12 @@ export class Service {
   @Column({ type: "int", nullable: true, default: 0 })
   recDeslike!: number;
 
+  @Column({ type: "decimal", nullable: true, default: 4.85 })
+  rating: number;
+
+  @Column({ type: "json", nullable: true, default: { in: [] } })
+  includesIn: { in: [] };
+
   @ManyToOne(() => ClinicTypeEntity, (clinicType: ClinicTypeEntity) => clinicType.services)
   @JoinColumn()
   clinicType!: ClinicTypeEntity;
