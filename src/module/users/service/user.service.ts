@@ -20,14 +20,14 @@ export class UserService {
     return await repository.save(newUser);
   }
 
-  static async getUserByEmail(email: string) {
+  static async getUserByEmail(email: string): Promise<Omit<User, 'password'>> {
     const user = await this.repository.findOne({ where: { email } });
 
     return Object.fromEntries(
       Object.entries(user as User).filter(
         ([key, _]) => !["password"].includes(key),
       ),
-    );
+    ) as Omit<User, 'password'>;
   }
 
   static async updatePassword(email: string, newPassword: string) {

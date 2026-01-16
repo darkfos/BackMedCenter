@@ -1,8 +1,12 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
+import { JwtPayload } from "jsonwebtoken";
+import { UserService } from "@/module/users";
 
 import { AnalysisService } from "@/module/analysis/service/AnalysisService";
 import { Analysis } from "@/module/analysis/dto/Analysis.dto";
+import { authMiddleware } from "@/utils";
+import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware";
 
 class AnalysController {
   router: Router;
@@ -13,7 +17,9 @@ class AnalysController {
   }
 
   initRoutes() {
-    this.router.get("/list", AnalysController.allAnalysis);
+    this.router.get("/list", isAdminMiddleware, AnalysController.allAnalysis);
+    this.router.get("/my", authMiddleware, AnalysController.myAnalysis);
+    this.router.post("/create", authMiddleware, isAdminMiddleware, AnalysController.createAnalysis);
   }
 
   static async allAnalysis(req: Request, res: Response) {
@@ -46,6 +52,20 @@ class AnalysController {
     return res
       .status(200)
       .json({ list: allAnalysis[0], totalCount: allAnalysis[1] });
+  }
+
+  static async myAnalysis(req: Request & JwtPayload, res: Response) {
+
+    const user = await UserService.getUserByEmail(req.token.email);
+    const myAnalysis = await AnalysisService.getList({pacient: user.id});
+
+    return res.status(200).json({ list: myAnalysis[0], totalCount: myAnalysis[1] });
+  }
+
+  static async createAnalysis(req: Request, res: Response) {
+    /*
+
+    */
   }
 }
 
