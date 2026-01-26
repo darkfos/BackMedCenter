@@ -26,10 +26,13 @@ class UserController {
                 #swagger.consumes = ['application/json']
 
                 #swagger.responses[200] = {
-                    $ref: '#/definitions/User'
+                    description: 'Информация о пользователе',
+                    schema: {
+                      $ref: '#/definitions/User'
+                    }
                 }
                 #swagger.responses[400] = {
-                    description: 'Не удалось получить информацию по пользователю'
+                    description: 'Не удалось получить информацию по пользователю',
                     schema: {
                         $ref: '#/definitions/Message'
                     }

@@ -6,9 +6,10 @@ import { join, resolve } from "node:path";
 import { StatusPacient } from "@/utils";
 
 const outputFile = path.join(__dirname, "..", "..", "..", "swagger.json");
-const endpointsFiles = globSync(
-  join(resolve() as string, "dist/module/*/controller/*.js"),
-);
+const endpointsFiles = [
+  ...globSync(join(resolve() as string, "dist/index.js")),
+  ...globSync(join(resolve(), "dist/module/*/controller/*.js")),
+];
 
 const doc = {
   info: {
@@ -156,6 +157,22 @@ const doc = {
       type: "кровь",
       costs: 1025,
       status: StatusPacient.HEALTHY,
+    },
+    ReviewFilters: {
+      message: 'отзыв...',
+      rating: 4
+    },
+    ReviewList: {
+      list: [
+        {
+          message: 'отзыв',
+          rating: 4,
+          userId: 1,
+          doctorId: 1,
+          createdAt: "2025-10-11",
+        },
+      ],
+      total: 1,
     },
   },
   host: "localhost:8088",

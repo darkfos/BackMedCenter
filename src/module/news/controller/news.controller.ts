@@ -16,56 +16,57 @@ class NewsController {
   }
 
   public initPaths() {
-    this.router.post("/create", authMiddleware, async (req, res) => {
-      /*
-                #swagger.method = 'POST'
-                #swagger.tags = ['News']
-                #swagger.summary = 'Создание новости'
-                #swagger.description = 'Создание новой новости администратором'
-                #swagger.produces = ['application/json']
-                #swagger.consumes = ['application/json']
 
-                #swagger.responses[200] = {
-                    description: 'Новость была создана',
-                    schema: { $ref: '#/definitions/Message' }
-                }
-                #swagger.responses[400] = {
-                    description: 'Не удалось создать новость',
-                    schema: { $ref: '#/definitions/Message' }
-                }
-            */
+    this.router.post("/create", authMiddleware, (req, res) => {
+      /*
+        #swagger.method = 'POST'
+        #swagger.tags = ['News']
+        #swagger.summary = 'Создание новости'
+        #swagger.description = 'Создание новой новости администратором'
+        #swagger.produces = ['application/json']
+        #swagger.consumes = ['application/json']
+
+        #swagger.responses[201] = {
+            description: 'Новость была создана',
+            schema: { $ref: '#/definitions/Message' }
+        }
+        #swagger.responses[400] = {
+            description: 'Не удалось создать новость',
+            schema: { $ref: '#/definitions/Message' }
+        }
+      */
 
       return NewsController.create(req, res);
     });
-    this.router.get("/list", (req, res) => {
+    this.router.post("/list", (req, res) => {
       /*
-                #swagger.method = 'GET'
-                #swagger.tags = ['News']
-                #swagger.summary = 'Список новостей'
-                #swagger.description = 'Получения списка новостей по фильтрам'
-                #swagger.produces = ['application/json']
-                #swagger.consumes = ['application/json']
+        #swagger.method = 'POST'
+        #swagger.tags = ['News']
+        #swagger.summary = 'Список новостей'
+        #swagger.description = 'Получения списка новостей по фильтрам'
+        #swagger.produces = ['application/json']
+        #swagger.consumes = ['application/json']
 
-                #swagger.parameters['body'] = {
-                    in: 'body',
-                    description: 'Фильтры для получения новостей',
-                    required: false,
-                    schema: {
-                        $ref: '#/definitions/NewsFilters'
-                    }
-                }
+        #swagger.parameters['body'] = {
+            in: 'body',
+            description: 'Фильтры для получения новостей',
+            required: false,
+            schema: {
+                $ref: '#/definitions/NewsFilters'
+            }
+        }
 
-                #swagger.responses[200] = {
-                    schema: {
-                        $ref: '#/definitions/NewsList'
-                    }
-                }
-                #swagger.responses[400] = {
-                    schema: {
-                        $ref: '#/definitions/List'
-                    }
-                }
-            */
+        #swagger.responses[200] = {
+            schema: {
+                $ref: '#/definitions/NewsList'
+            }
+        }
+        #swagger.responses[400] = {
+            schema: {
+                $ref: '#/definitions/NewsList'
+            }
+        }
+    */
 
       return NewsController.list(req, res);
     });
@@ -105,29 +106,29 @@ class NewsController {
     });
     this.router.delete("/delete", authMiddleware, (req, res) => {
       /*
-                #swagger.method = 'DELETE'
-                #swagger.tags = ['News']
-                #swagger.summary = 'Удаление новости'
-                #swagger.description = 'Удаление новости администратором'
-                #swagger.produces = ['application/json']
-                #swagger.consumes = ['application/json']
+          #swagger.method = 'DELETE'
+          #swagger.tags = ['News']
+          #swagger.summary = 'Удаление новости'
+          #swagger.description = 'Удаление новости администратором'
+          #swagger.produces = ['application/json']
+          #swagger.consumes = ['application/json']
 
-                #swagger.parameters['id'] = {
-                    in: 'query',
-                    description: 'Идентификатор новости',
-                    required: true,
-                    type: 'integer'
-                }
+          #swagger.parameters['id'] = {
+              in: 'query',
+              description: 'Идентификатор новости',
+              required: true,
+              type: 'integer'
+          }
 
-                #swagger.responses[200] = {
-                    description: 'Новость была удалена',
-                    schema: { $ref: '#/definitions/Message' }
-                }
-                #swagger.responses[400] = {
-                    description: 'Не удалось удалить новость',
-                    schema: { $ref: '#/definitions/Message' }
-                }
-            */
+          #swagger.responses[200] = {
+              description: 'Новость была удалена',
+              schema: { $ref: '#/definitions/Message' }
+          }
+          #swagger.responses[400] = {
+              description: 'Не удалось удалить новость',
+              schema: { $ref: '#/definitions/Message' }
+          }
+      */
 
       return NewsController.delete(req, res);
     });

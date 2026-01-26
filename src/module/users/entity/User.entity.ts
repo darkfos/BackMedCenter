@@ -19,6 +19,7 @@ import { ClinicTypeEntity } from "@/module/services/entity/ClinicType.entity";
 import { ReviewEntity } from "@/module/services/entity/Review.entity";
 import { PacientPrescriptions } from "@/module/pacients/entity/PacientPrescriptions.entity";
 import { HistoryDiseases } from "@/module/pacients/entity/HistoryDiseases.entity";
+import { ReviewService } from "@/module/services";
 
 @Entity({ name: "users" })
 export class User {
@@ -100,7 +101,10 @@ export class User {
   services!: Array<Record<string, any>>;
 
   @OneToMany(() => ReviewEntity, (review) => review.user)
-  reviews!: Array<ReviewEntity>;
+  myReviews!: Array<ReviewEntity>;
+
+  @OneToMany(() => ReviewEntity, (review) => review.doctor)
+  doctorReviews!: Array<ReviewEntity>
 
   @OneToMany(() => HistoryDiseases, (hisDiases) => hisDiases.doctor)
   doctorHistoryDiseases!: Array<HistoryDiseases>;

@@ -24,13 +24,12 @@ app.use(
 );
 app.use("/static", express.static(join(__dirname, "public")));
 
-// Router's
+app.use("/", serviceController.router);
 app.use("/auth", authController.router);
 app.use("/news", newsController.router);
 app.use("/users", userController.router);
 app.use("/analys", analysisController.router);
 app.use("/pacients", pacientsController.router);
-app.use("/service", serviceController.router);
 
 // Post middlewarees
 app.use(postAuthMiddleware);

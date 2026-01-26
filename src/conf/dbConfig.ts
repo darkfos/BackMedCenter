@@ -31,7 +31,6 @@ class DBConfig {
   }
 
   get redis_url() {
-    console.log(this.REDIS_URL, process.env.REDIS_URL);
     return this.REDIS_URL;
   }
 }

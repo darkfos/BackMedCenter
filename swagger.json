@@ -36,8 +36,16 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/definitions/User",
-            "description": "OK"
+            "description": "Информация о пользователе",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Не удалось получить информацию по пользователю",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
           }
         }
       }
@@ -217,7 +225,7 @@
       }
     },
     "/consult/list": {
-      "get": {
+      "post": {
         "tags": [
           "Consult"
         ],
@@ -246,26 +254,83 @@
             "schema": {
               "$ref": "#/definitions/ConsultList"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
     "/review/create": {
       "post": {
-        "description": "",
+        "tags": [
+          "Review"
+        ],
+        "summary": "Создание консультации",
+        "description": "Созданией консультации",
+        "consumes": [
+          "body"
+        ],
+        "produces": [
+          "body"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "Данные для создания консультации",
+            "schema": {
+              "$ref": "#/definitions/Consult"
+            }
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "201": {
+            "description": "Отзыв был создан",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "400": {
+            "description": "Не удалось создать отзыв",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
           }
         }
       }
     },
-    "/attendance/create": {
+    "/review/list": {
       "post": {
-        "description": "",
+        "tags": [
+          "Review"
+        ],
+        "summary": "Получение всех отзывов по фильтрам",
+        "description": "Получение всех отзывов по фильтрам",
+        "consumes": [
+          "body"
+        ],
+        "produces": [
+          "body"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": false,
+            "description": "Фильтры для поиска отзывов",
+            "schema": {
+              "$ref": "#/definitions/ReviewList"
+            }
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "Список всех отзывов",
+            "schema": {
+              "$ref": "#/definitions/ReviewFilters"
+            }
           }
         }
       }
@@ -273,10 +338,10 @@
     "/create": {
       "post": {
         "tags": [
-          "News"
+          "Analysis"
         ],
-        "summary": "Создание новости",
-        "description": "Создание новой новости администратором",
+        "summary": "Создания анализа",
+        "description": "Создание анализа для пациента",
         "consumes": [
           "application/json"
         ],
@@ -284,7 +349,7 @@
           "application/json"
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "Новость была создана",
             "schema": {
               "$ref": "#/definitions/Message"
@@ -295,12 +360,15 @@
             "schema": {
               "$ref": "#/definitions/Message"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
     "/list": {
-      "get": {
+      "post": {
         "tags": [
           "News"
         ],
@@ -316,7 +384,7 @@
           {
             "name": "body",
             "in": "body",
-            "description": "Фильтры доя получения новостей",
+            "description": "Фильтры для получения новостей",
             "required": false,
             "schema": {
               "$ref": "#/definitions/NewsFilters"
@@ -332,9 +400,44 @@
           },
           "400": {
             "schema": {
-              "$ref": "#/definitions/List"
+              "$ref": "#/definitions/NewsList"
             },
             "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Analysis"
+        ],
+        "summary": "Получение списка анализов",
+        "description": "Получение списка всех анализов с количеством",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Фильтры для получения анализов",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/AnalysFilters"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/AnalysisList"
+            },
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -570,6 +673,29 @@
                 "name": "main"
               }
             }
+          }
+        }
+      }
+    },
+    "/my": {
+      "get": {
+        "tags": [
+          "Analysis"
+        ],
+        "summary": "Получение списка анализов пользователя",
+        "description": "Получение списка всех анализов пользователя с количеством",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "$ref": "#/definitions/AnalysisList"
+            },
+            "description": "OK"
           }
         }
       }
@@ -830,6 +956,135 @@
               "phone": {
                 "type": "string",
                 "example": "8 988 982 23 23"
+              }
+            }
+          }
+        },
+        "total": {
+          "type": "number",
+          "example": 1
+        }
+      }
+    },
+    "AnalysisList": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "example": "Тип"
+              },
+              "text": {
+                "type": "string",
+                "example": "Текст"
+              },
+              "status": {
+                "type": "string",
+                "example": "DEAD"
+              },
+              "assignedDate": {
+                "type": "string",
+                "example": "2025-10-10"
+              },
+              "takenDate": {
+                "type": "string",
+                "example": "2025-10-10"
+              },
+              "readyDate": {
+                "type": "string",
+                "example": "2025-10-10"
+              },
+              "results": {
+                "type": "object",
+                "properties": {
+                  "blood": {
+                    "type": "string",
+                    "example": "C+"
+                  }
+                }
+              },
+              "costs": {
+                "type": "number",
+                "example": 200
+              },
+              "updatedAt": {
+                "type": "string",
+                "example": "2025-10-11"
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "2025-10-11"
+              }
+            }
+          }
+        },
+        "total": {
+          "type": "number",
+          "example": 1
+        }
+      }
+    },
+    "AnalysFilters": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "example": "кровь"
+        },
+        "costs": {
+          "type": "number",
+          "example": 1025
+        },
+        "status": {
+          "type": "string",
+          "example": "HEALTHY"
+        }
+      }
+    },
+    "ReviewFilters": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "отзыв..."
+        },
+        "rating": {
+          "type": "number",
+          "example": 4
+        }
+      }
+    },
+    "ReviewList": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "отзыв"
+              },
+              "rating": {
+                "type": "number",
+                "example": 4
+              },
+              "userId": {
+                "type": "number",
+                "example": 1
+              },
+              "doctorId": {
+                "type": "number",
+                "example": 1
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "2025-10-11"
               }
             }
           }

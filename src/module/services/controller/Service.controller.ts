@@ -3,11 +3,13 @@ import { Router, Request, Response } from "express";
 import {
   ClinicType,
   ClinicTypeService,
-  ConsultService,
+  ConsultService, ReviewService,
 } from "@/module/services";
 import { authMiddleware } from "@/utils";
 import { uploadIcons } from "@/utils/fileManager/storage";
 import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware";
+import { JwtPayload } from "jsonwebtoken";
+import { ReviewFilter } from "@/module/services/dto/Review.dto";
 
 class ServiceController {
   router: Router;
@@ -126,12 +128,12 @@ class ServiceController {
         return ServiceController.createConsult(req, res);
       },
     );
-    this.router.get(
+    this.router.post(
       "/consult/list",
       isAdminMiddleware,
       (req: Request, res: Response) => {
         /*
-        #swagger.method = 'GET'
+        #swagger.method = 'POST'
         #swagger.tags = ['Consult']
         #swagger.summary = 'Получение всех заявок на консультации'
         #swagger.description = 'Получение списка всех заявок на консультации'
@@ -157,8 +159,69 @@ class ServiceController {
         return ServiceController.listConsult(req, res);
       },
     );
-    this.router.post("/review/create", (req: Request, res: Response) => {});
-    this.router.post("/attendance/create", (req: Request, res: Response) => {});
+    this.router.post("/review/create", authMiddleware, (req: Request, res: Response) => {
+      /*
+        #swagger.method = 'POST'
+        #swagger.tags = ['Review']
+        #swagger.summary = 'Создание консультации'
+        #swagger.description = 'Созданией консультации'
+        #swagger.produces = 'application/json'
+        #swagger.consumes = 'multipart/form-data'
+
+        #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          description: 'Данные для создания консультации',
+          schema: {
+            $ref: '#/definitions/Consult'
+          }
+        }
+
+        #swagger.responses[201] = {
+          description: 'Отзыв был создан',
+          schema: {
+            $ref: '#/definitions/Message'
+          }
+        }
+        #swagger.responses[400] = {
+          description: 'Не удалось создать отзыв',
+          schema: {
+            $ref: '#/definitions/Message'
+          }
+        }
+      */
+
+      return ServiceController.createReview(req, res);
+    });
+    this.router.post('/review/list', (req: Request, res: Response) => {
+      /*
+              #swagger.method = 'POST'
+              #swagger.tags = ['Review']
+              #swagger.summary = 'Получение всех отзывов по фильтрам'
+              #swagger.description = 'Получение всех отзывов по фильтрам'
+              #swagger.produces = 'application/json'
+              #swagger.consumes = 'application/json'
+
+              #swagger.parameters['body'] = {
+                in: 'body',
+                required: false,
+                description: 'Фильтры для поиска отзывов',
+                schema: {
+                  $ref: '#/definitions/ReviewList'
+                }
+              }
+
+              #swagger.responses[200] = {
+                description: 'Список всех отзывов',
+                schema: {
+                  $ref: '#/definitions/ReviewFilters'
+                }
+              }
+        */
+
+      return ServiceController.allReviews(req, res);
+    });
+    // this.router.post("/attendance/create", (req: Request, res: Response) => {});
   }
 
   static async createClinic(req: Request, res: Response) {
@@ -203,6 +266,23 @@ class ServiceController {
     return res
       .status(200)
       .json({ list: allConsults[0], total: allConsults[1] });
+  }
+
+  static async createReview(req: Request & JwtPayload, res: Response) {
+    const { message, rating, doctorId } = req.body;
+    const reviewData = await ReviewService.create({ message, rating }, doctorId, req.token.email);
+
+    if (reviewData) {
+      return res.status(201).json({ message: "Отзыв был создан"})
+    }
+
+    return res.status(400).json({ message: "Не удалось создать отзыв"})
+  }
+
+  static async allReviews(req: Request, res: Response) {
+    const data = await req.body;
+    const allReviews = await ReviewService.all(data as ReviewFilter);
+    return res.status(200).json({ list: allReviews[0], total: allReviews[1] });
   }
 }
 

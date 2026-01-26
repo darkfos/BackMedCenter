@@ -30,7 +30,11 @@ export class ReviewEntity {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @ManyToOne(() => User, (user) => user.reviews)
+  @ManyToOne(() => User, (user) => user.myReviews)
   @JoinColumn()
   user!: User;
+
+  @ManyToOne(() => User, (user) => user.doctorReviews)
+  @JoinColumn()
+  doctor!: User;
 }
