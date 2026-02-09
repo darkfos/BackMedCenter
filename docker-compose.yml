@@ -1,0 +1,64 @@
+services:
+  med_back:
+    container_name: med_back
+    build: .
+    ports:
+      - 8088:8088
+    depends_on:
+      med_db:
+        condition: service_healthy
+      med_rd:
+        condition: service_started
+    environment:
+      MED_DB_HOST: med_db
+      MED_DB_PORT: 5432
+      MED_DB_USER: postgres
+      MED_DB_NAME: med_pro
+      MED_DB_PASSWORD: postgres
+      ACCESS_TOKEN_KEY: dsjkaiortenfbsu423djlkfut4965j2klfu854
+      REFRESH_TOKEN_KEY: 4328kfdljskf34857349iofjkdhsjfu84359fjklg8435
+      ACCESS_EXPIRE_TIME_LIFE: 10
+      REFRESH_EXPIRE_TIME_LIFE: 30
+      ALGORITHM: HS256
+      REDIS_URL: redis://med_rd:6379
+    networks:
+      - med
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/med_app
+  med_db:
+    container_name: med_db
+    image: postgres:18-alpine
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: med_pro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres_user -d postgres_db"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data/pgdata
+    networks:
+      - med
+  med_rd:
+    container_name: med_rd
+    image: redis:8.4-alpine
+    restart: always
+    ports:
+      - 6380:6379
+    volumes:
+      - ./cache:/data
+    networks:
+      - med
+    depends_on:
+      - med_db
+
+networks:
+  med:
+    driver: bridge
