@@ -33,20 +33,6 @@ export class AddClinicTypesTable1767448719791 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "users" ADD CONSTRAINT "FK_bf9f3d21980db21ce628b3a5455" FOREIGN KEY ("clinicTypeId") REFERENCES "med_type"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
-
-    // Внесение данных в таблицу
-    await queryRunner.query(
-      `INSERT INTO "med_type" ("name", "icon") 
-           VALUES
-           ('Терапия', 'icons/therapy_icon.svg'),
-           ('Неврология', 'icons/neurology_icon.svg'),
-           ('Ортопедия', 'icons/orthopegy_icon.svg'),
-           ('Офтальмология', 'icons/oftamology_icon.svg'),
-           ('Стоматология', 'icons/stomatology_icon.svg'),
-           ('Педиатрия', 'icons/pediatry_icon.svg'),
-           ('Диагностика', 'icons/diagnostic_icon.svg')
-           `,
-    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

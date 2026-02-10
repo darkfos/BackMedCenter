@@ -5,11 +5,12 @@ import {
   ClinicTypeService,
   ConsultService, ReviewService,
 } from "@/module/services";
-import { authMiddleware } from "@/utils";
+import { authMiddleware, validateBodyDTOMiddleware } from "@/utils";
 import { uploadIcons } from "@/utils/fileManager/storage";
 import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware";
 import { JwtPayload } from "jsonwebtoken";
 import { ReviewFilter } from "@/module/services/dto/Review.dto";
+import { ConsultDTO} from "@/module/services/dto/Consult.dto";
 
 class ServiceController {
   router: Router;
@@ -93,7 +94,7 @@ class ServiceController {
     });
     this.router.post(
       "/consult/create",
-      authMiddleware,
+      validateBodyDTOMiddleware(ConsultDTO),
       (req: Request, res: Response) => {
         /*
         #swagger.method = 'POST'
@@ -281,6 +282,11 @@ class ServiceController {
 
   static async allReviews(req: Request, res: Response) {
     const data = await req.body;
+
+    if (!data) {
+      return res.status(200).json({ list: [], total: 0 });
+    }
+
     const allReviews = await ReviewService.all(data as ReviewFilter);
     return res.status(200).json({ list: allReviews[0], total: allReviews[1] });
   }

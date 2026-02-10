@@ -26,8 +26,6 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
-    volumes:
-      - .:/med_app
   med_db:
     container_name: med_db
     image: postgres:18-alpine
