@@ -31,7 +31,7 @@ app.use("/users", userController.router);
 app.use("/analys", analysisController.router);
 app.use("/pacients", pacientsController.router);
 
-// Post middlewarees
+// Post middlewares
 app.use(postAuthMiddleware);
 
 dbSource
