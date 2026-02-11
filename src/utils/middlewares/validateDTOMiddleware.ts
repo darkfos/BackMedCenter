@@ -18,7 +18,7 @@ export const validateBodyDTOMiddleware = (ValidateSchema: any) => {
 
       next();
     } catch (errors) {
-      res.status(400).json({ detail: errors })
+      res.status(400).json({ detail: Object.keys(errors as object).length ? errors : 'Не переданы параметры' })
     }
   }
 }
@@ -39,7 +39,7 @@ export const validateQueryDTOMiddleware = (ValidateSchema: any) => {
 
       next();
     } catch (errors) {
-      res.status(400).json({ detail: errors })
+      res.status(400).json({ detail: Object.keys(errors as object).length ? errors : 'Не переданы параметры' })
     }
   }
 }
