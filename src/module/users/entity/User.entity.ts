@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  ManyToMany,
   ManyToOne,
   JoinColumn,
 } from "typeorm";
@@ -14,12 +13,10 @@ import { UserTypes, FormatWorks } from "@/utils";
 import { News } from "@/module/news";
 import { Pacients } from "@/module/pacients";
 import { Analyses } from "@/module/analysis";
-import { Service } from "@/module/services/entity/Service.entity";
 import { ClinicTypeEntity } from "@/module/services/entity/ClinicType.entity";
 import { ReviewEntity } from "@/module/services/entity/Review.entity";
 import { PacientPrescriptions } from "@/module/pacients/entity/PacientPrescriptions.entity";
 import { HistoryDiseases } from "@/module/pacients/entity/HistoryDiseases.entity";
-import { ReviewService } from "@/module/services";
 
 @Entity({ name: "users" })
 export class User {
@@ -29,7 +26,7 @@ export class User {
   @Column({ type: "varchar", length: 125, unique: true, nullable: false })
   email!: string;
 
-  @Column({ type: "text", nullable: false })
+  @Column({ type: "text", nullable: false, select: false })
   password!: string;
 
   @Column({ type: "decimal", nullable: true, default: 4.85 })
@@ -43,6 +40,15 @@ export class User {
 
   @Column({ type: "json", nullable: true, default: { days: ["пн"] } })
   dayWork!: { days: ["пн"] };
+
+  @Column({ type: "varchar", length: 185, nullable: true, default: '' })
+  position!: string;
+
+  @Column({ type: "text", array: true, nullable: true, default: []})
+  competencies!: string[];
+
+  @Column({ type: "int", nullable: true, default: 0 })
+  consultPrice!: number;
 
   @Column({
     type: "varchar",
@@ -96,9 +102,6 @@ export class User {
 
   @OneToMany(() => Analyses, (analys) => analys.doctor)
   doctorAnalysis!: Array<Analyses>;
-
-  @ManyToMany(() => Service, (services) => services.doctors)
-  services!: Array<Record<string, any>>;
 
   @OneToMany(() => ReviewEntity, (review) => review.user)
   myReviews!: Array<ReviewEntity>;

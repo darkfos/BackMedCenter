@@ -29,7 +29,7 @@ export const validateQueryDTOMiddleware = (ValidateSchema: any) => {
 
     try {
       const schema = new ValidateSchema();
-      const params = req.params;
+      const params = req.query;
 
       Object.keys(schema).forEach(key => {
         schema[key] = params[key];

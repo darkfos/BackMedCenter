@@ -17,9 +17,6 @@ export class AddReviewsTable1767452075153 implements MigrationInterface {
       `ALTER TABLE "users" ADD "studyBuild" character varying(255)`,
     );
     await queryRunner.query(
-      `ALTER TABLE "services" ALTER COLUMN "rating" SET DEFAULT '4.85'`,
-    );
-    await queryRunner.query(
       `ALTER TABLE "review" ADD CONSTRAINT "FK_1337f93918c70837d3cea105d39" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
   }
@@ -27,9 +24,6 @@ export class AddReviewsTable1767452075153 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `ALTER TABLE "review" DROP CONSTRAINT "FK_1337f93918c70837d3cea105d39"`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "services" ALTER COLUMN "rating" SET DEFAULT 4.85`,
     );
     await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "studyBuild"`);
     await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "experience"`);

@@ -335,6 +335,43 @@
         }
       }
     },
+    "/doctor/list": {
+      "post": {
+        "tags": [
+          "Doctors"
+        ],
+        "summary": "Получение всех докторов по фильтрам",
+        "description": "Получение всех докторов по фильтрам",
+        "consumes": [
+          "body"
+        ],
+        "produces": [
+          "body"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": false,
+            "description": "Фильтры для поиска доктора",
+            "schema": {
+              "$ref": "#/definitions/ReviewList"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список всех отзывов",
+            "schema": {
+              "$ref": "#/definitions/DoctorFilters"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/create": {
       "post": {
         "tags": [
@@ -1042,6 +1079,83 @@
         "status": {
           "type": "string",
           "example": "HEALTHY"
+        }
+      }
+    },
+    "DoctorFilters": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "example": "object"
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "string"
+                },
+                "example": {
+                  "type": "string",
+                  "example": "Геннадий Васильевич ..."
+                }
+              }
+            },
+            "specialization": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "string"
+                },
+                "example": {
+                  "type": "string",
+                  "example": "Терапия"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "DoctorList": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "отзыв"
+              },
+              "rating": {
+                "type": "number",
+                "example": 4
+              },
+              "userId": {
+                "type": "number",
+                "example": 1
+              },
+              "doctorId": {
+                "type": "number",
+                "example": 1
+              },
+              "createdAt": {
+                "type": "string",
+                "example": "2025-10-11"
+              }
+            }
+          }
+        },
+        "total": {
+          "type": "number",
+          "example": 1
         }
       }
     },

@@ -26,9 +26,6 @@ export class PacientRelationships1767463930873 implements MigrationInterface {
     );
     await queryRunner.query(`ALTER TABLE "analys" ADD "pacientId" integer`);
     await queryRunner.query(
-      `ALTER TABLE "services" ALTER COLUMN "rating" SET DEFAULT '4.85'`,
-    );
-    await queryRunner.query(
       `ALTER TABLE "users" ALTER COLUMN "rating" SET DEFAULT '4.85'`,
     );
     await queryRunner.query(
@@ -72,9 +69,6 @@ export class PacientRelationships1767463930873 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "users" ALTER COLUMN "rating" SET DEFAULT 4.85`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "services" ALTER COLUMN "rating" SET DEFAULT 4.85`,
     );
     await queryRunner.query(`ALTER TABLE "analys" DROP COLUMN "pacientId"`);
     await queryRunner.query(`ALTER TABLE "analys" DROP COLUMN "createdAt"`);

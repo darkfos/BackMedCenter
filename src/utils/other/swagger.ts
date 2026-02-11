@@ -158,6 +158,31 @@ const doc = {
       costs: 1025,
       status: StatusPacient.HEALTHY,
     },
+    DoctorFilters: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          example: "Геннадий Васильевич ..."
+        },
+        specialization: {
+          type: "string",
+          example: "Терапия"
+        }
+      }
+    },
+    DoctorList: {
+      list: [
+        {
+          message: 'отзыв',
+          rating: 4,
+          userId: 1,
+          doctorId: 1,
+          createdAt: "2025-10-11",
+        },
+      ],
+      total: 1,
+    },
     ReviewFilters: {
       message: 'отзыв...',
       rating: 4

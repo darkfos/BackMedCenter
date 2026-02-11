@@ -11,9 +11,6 @@ export class UpdateUserTable1767461678381 implements MigrationInterface {
       `ALTER TABLE "users" ADD "scheduleWork" character varying(50) DEFAULT '8:00 - 17:00'`,
     );
     await queryRunner.query(
-      `ALTER TABLE "services" ALTER COLUMN "rating" SET DEFAULT '4.85'`,
-    );
-    await queryRunner.query(
       `ALTER TABLE "users" ALTER COLUMN "rating" SET DEFAULT '4.85'`,
     );
     await queryRunner.query(
@@ -53,9 +50,6 @@ export class UpdateUserTable1767461678381 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "users" ALTER COLUMN "rating" SET DEFAULT 4.85`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "services" ALTER COLUMN "rating" SET DEFAULT 4.85`,
     );
     await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "scheduleWork"`);
     await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "dayWork"`);

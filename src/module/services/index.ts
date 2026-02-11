@@ -1,6 +1,5 @@
 export { ClinicTypeEntity } from "./entity/ClinicType.entity";
 export { Consult } from "./entity/Consult.entity";
-export { Service } from "./entity/Service.entity";
 export { ReviewEntity } from "./entity/Review.entity";
 export { ReviewService } from "./service/review.service";
 export { ConsultService } from "./service/consult.service";

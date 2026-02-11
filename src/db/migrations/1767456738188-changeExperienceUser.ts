@@ -5,9 +5,6 @@ export class ChangeExperienceUser1767456738188 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE "services" ALTER COLUMN "rating" SET DEFAULT '4.85'`,
-    );
-    await queryRunner.query(
       `ALTER TABLE "users" ALTER COLUMN "rating" SET DEFAULT '4.85'`,
     );
     await queryRunner.query(
@@ -27,9 +24,6 @@ export class ChangeExperienceUser1767456738188 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "users" ALTER COLUMN "rating" SET DEFAULT 4.85`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE "services" ALTER COLUMN "rating" SET DEFAULT 4.85`,
     );
   }
 }

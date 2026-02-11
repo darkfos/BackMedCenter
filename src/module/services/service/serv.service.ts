@@ -1,9 +1,20 @@
-import { Repository } from "typeorm";
+import { ILike, Repository } from "typeorm";
 
 import { dbSource } from "@/db/data-source";
-import { Service } from "@/module/services";
+import { User } from "@/module/users";
+import { UserTypes } from "@/utils";
 
 export class ServService {
-  protected static servRepository: Repository<Service> =
-    dbSource.getRepository(Service);
+  protected static userRepository: Repository<User> = dbSource.getRepository(User);
+
+  static async getDoctors(doctorName: string, specialization: string) : Promise<[User[], number]> {
+    const doctors = await this.userRepository.findAndCount({
+      where: {
+        userType: UserTypes.DOCTOR,
+        fullName: ILike(`%${(doctorName ?? "").toLowerCase()}%`),
+      }
+    });
+
+    return doctors;
+  }
 }

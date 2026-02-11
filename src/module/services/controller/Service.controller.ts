@@ -3,7 +3,7 @@ import { Router, Request, Response } from "express";
 import {
   ClinicType,
   ClinicTypeService,
-  ConsultService, ReviewService,
+  ConsultService, ReviewService, ServService,
 } from "@/module/services";
 import { authMiddleware, validateBodyDTOMiddleware } from "@/utils";
 import { uploadIcons } from "@/utils/fileManager/storage";
@@ -11,6 +11,8 @@ import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware";
 import { JwtPayload } from "jsonwebtoken";
 import { ReviewFilter } from "@/module/services/dto/Review.dto";
 import { ConsultDTO} from "@/module/services/dto/Consult.dto";
+import { validateQueryDTOMiddleware } from "@/utils/middlewares/validateDTOMiddleware";
+import { DoctorDTO } from "@/module/services/dto/Doctor.dto";
 
 class ServiceController {
   router: Router;
@@ -222,7 +224,34 @@ class ServiceController {
 
       return ServiceController.allReviews(req, res);
     });
-    // this.router.post("/attendance/create", (req: Request, res: Response) => {});
+    this.router.get('/doctor/list', validateQueryDTOMiddleware(DoctorDTO), (req: Request, res: Response) => {
+      /*
+        #swagger.method = 'GET'
+        #swagger.tags = ['Doctors']
+        #swagger.summary = 'Получение всех докторов по фильтрам'
+        #swagger.description = 'Получение всех докторов по фильтрам'
+        #swagger.produces = 'application/json'
+        #swagger.consumes = 'application/json'
+
+        #swagger.parameters['body'] = {
+          in: 'body',
+          required: false,
+          description: 'Фильтры для поиска доктора',
+          schema: {
+            $ref: '#/definitions/ReviewList'
+          }
+        }
+
+        #swagger.responses[200] = {
+          description: 'Список всех отзывов',
+          schema: {
+            $ref: '#/definitions/DoctorFilters'
+          }
+        }
+      */
+
+      return ServiceController.getDoctors(req, res);
+    })
   }
 
   static async createClinic(req: Request, res: Response) {
@@ -289,6 +318,13 @@ class ServiceController {
 
     const allReviews = await ReviewService.all(data as ReviewFilter);
     return res.status(200).json({ list: allReviews[0], total: allReviews[1] });
+  }
+
+  static async getDoctors(req: Request, res: Response) {
+    const params: Record<keyof DoctorDTO, string> = req.params as Record<keyof DoctorDTO, string>;
+    const allDoctors = await ServService.getDoctors(params.username, params.specialization)
+
+    return res.status(200).json({ list: allDoctors[0], total: allDoctors[1] });
   }
 }
 
