@@ -66,7 +66,7 @@ export class User {
   })
   fullName!: string;
 
-  @Column({ type: "boolean", nullable: true, default: false })
+  @Column({ type: "boolean", nullable: true, default: false, select: false })
   isAdmin!: boolean;
 
   @CreateDateColumn({ type: "date", nullable: false })
@@ -75,7 +75,7 @@ export class User {
   @UpdateDateColumn({ type: "date", nullable: true })
   updatedAt!: Date;
 
-  @Column({ type: "enum", enum: UserTypes, default: UserTypes.PACIENT })
+  @Column({ type: "enum", enum: UserTypes, default: UserTypes.PACIENT, select: false })
   userType!: UserTypes;
 
   @ManyToOne(() => ClinicTypeEntity, (clinicType) => clinicType.doctors)

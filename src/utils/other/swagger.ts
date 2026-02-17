@@ -206,7 +206,7 @@ const doc = {
 
 swaggerAutogen(/* options */)(outputFile, endpointsFiles, doc)
   .then(() => {
-    console.log("Swagger was generated successfully.");
+    console.log("SwaggNewsTranslateTypeser was generated successfully.");
   })
   .catch(() => {
     console.log("Swagger doesn't generated successfully.");

@@ -71,7 +71,7 @@ class ServiceController {
       /*
         #swagger.method = 'GET'
         #swagger.tags = ['Clinic']
-        #swagger.summary = 'Получение всех типов услуг клиник'
+        #swagger.summary = 'Получение всех типов услуг клиники'
         #swagger.description = 'Получение списка всех типов услуг клиники'
         #swagger.produces = 'application/json'
         #swagger.consumes = 'application/json'
@@ -321,10 +321,10 @@ class ServiceController {
   }
 
   static async getDoctors(req: Request, res: Response) {
-    const params: Record<keyof DoctorDTO, string> = req.params as Record<keyof DoctorDTO, string>;
-    const allDoctors = await ServService.getDoctors(params.username, params.specialization)
+    const params: DoctorDTO = req.query as unknown as DoctorDTO;
+    const allDoctors = await ServService.getDoctors(params.username, params.specialization, params.formatWork, Number(params.page), Number(params.pageSize));
 
-    return res.status(200).json({ list: allDoctors[0], total: allDoctors[1] });
+    return res.status(200).json(allDoctors);
   }
 }
 
