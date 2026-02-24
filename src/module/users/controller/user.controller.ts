@@ -11,28 +11,23 @@ import { AppointmentsService } from "@/module/pacients/service/Appointments.serv
 import { CreateAppointmentDTO } from "@/module/pacients/dto/CreateAppointment.dto.js";
 import { DoctorAvailabilityService } from "@/module/pacients/service/DoctorAvailability.service.js";
 
-/** Запрос на создание доктора: body проверен validateBodyDTOMiddleware(CreateDoctorDTO), доступ — только админ */
 interface CreateDoctorRequest extends Request {
   body: CreateDoctorDTO;
 }
 
-/** Запрос на обновление доктора: body проверен validateBodyDTOMiddleware(UpdateDoctorDTO), доступ — только админ */
 interface UpdateDoctorRequest extends Request {
   body: UpdateDoctorDTO;
   params: { id: string };
 }
 
-/** Запрос с id доктора в params (удаление, получение пациентов); доступ — только админ */
 interface DoctorIdParamsRequest extends Request {
   params: { id: string };
 }
 
-/** Запрос на обновление профиля (персональные данные); body — UpdateProfileDTO */
 interface UpdateProfileRequest extends Request {
   body: UpdateProfileDTO;
 }
 
-/** Запрос на создание приёма; body — CreateAppointmentDTO */
 interface CreateAppointmentRequest extends Request {
   body: CreateAppointmentDTO;
 }

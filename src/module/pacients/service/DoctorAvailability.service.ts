@@ -16,7 +16,6 @@ const WEEKDAY_TO_RU: Record<number, string> = {
 
 const SLOT_MINUTES = 30;
 
-/** Парсит "8:00 - 17:00" в [startMinutes, endMinutes] от полуночи */
 function parseSchedule(scheduleWork: string): { start: number; end: number } {
   const match = scheduleWork.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
   if (!match) {
@@ -32,7 +31,6 @@ function parseSchedule(scheduleWork: string): { start: number; end: number } {
   };
 }
 
-/** Генерирует слоты с шагом SLOT_MINUTES между start и end (end не включается) */
 function timeSlotsBetween(startMinutes: number, endMinutes: number): string[] {
   const slots: string[] = [];
   for (let m = startMinutes; m < endMinutes; m += SLOT_MINUTES) {
@@ -84,10 +82,6 @@ export class DoctorAvailabilityService {
     return dbSource.getRepository(User);
   }
 
-  /**
-   * Список всех доступных дат в диапазоне [from, to] с вложенными свободными слотами.
-   * Только даты, когда доктор работает (dayWork) и есть хотя бы один свободный час.
-   */
   static async getAvailableDatesWithSlots(
     doctorId: number,
     fromStr: string,

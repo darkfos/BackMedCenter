@@ -19,7 +19,6 @@ export class AppointmentsService {
     return dbSource.getRepository(User);
   }
 
-  /** Все приёмы текущего пользователя (по всем картам), сортировка: дата по убыванию, время */
   static async getByUserId(userId: number): Promise<PacientVisit[]> {
     const cards = await this.pacientsRepository.find({
       where: { pacient: { id: userId } },
@@ -34,7 +33,6 @@ export class AppointmentsService {
     });
   }
 
-  /** Создание приёма: пользователь записывается к доктору. Если карты (пациент+доктор) нет — создаётся автоматически. */
   static async create(
     userId: number,
     data: CreateAppointmentDTO,

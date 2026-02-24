@@ -27,7 +27,6 @@ export class MedicalHistoryService {
     });
   }
 
-  /** История по id пользователя (пациента): все записи по всем картам этого пользователя */
   static async getByUserId(userId: number): Promise<HistoryDiseases[]> {
     const cards = await this.pacientsRepository.find({
       where: { pacient: { id: userId } },
