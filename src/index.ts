@@ -25,14 +25,13 @@ app.use(
 );
 const publicRoot = join(process.cwd(), "public");
 app.use("/static", express.static(publicRoot));
-app.use("/statics", express.static(join(publicRoot, "images")));
 
-app.use("/", serviceController.router);
-app.use("/auth", authController.router);
-app.use("/news", newsController.router);
-app.use("/users", userController.router);
-app.use("/analys", analysisController.router);
-app.use("/pacients", pacientsController.router);
+app.use("/api", serviceController.router);
+app.use("/api/auth", authController.router);
+app.use("/api/news", newsController.router);
+app.use("/api/users", userController.router);
+app.use("/api/analys", analysisController.router);
+app.use("/api/pacients", pacientsController.router);
 
 // Post middlewares
 app.use(postAuthMiddleware);
