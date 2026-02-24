@@ -19,6 +19,8 @@ RUN ["npm", "install", "--omit=dev"]
 COPY swagger.json ./
 COPY --from=builder /med_app/dist ./dist
 
+RUN node -e "require('./dist/db/data-source.js')" || (echo "Missing dist/db/data-source.js" && ls -la dist/ 2>/dev/null; exit 1)
+
 EXPOSE 8088
 
-CMD ["sh", "-c", "npm run migration && npm run start"]
+CMD ["sh", "-c", "npx typeorm migration:run -d /med_app/dist/db/data-source.js && node dist/index.js"]

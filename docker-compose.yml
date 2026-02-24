@@ -6,19 +6,17 @@ services:
     ports:
       - 8088:8088
     environment:
-      MED_DB_HOST: host.docker.internal
-      MED_DB_PORT: 5432
-      MED_DB_USER: darkfos82
-      MED_DB_NAME: med_pro
-      MED_DB_PASSWORD: chaiki45
+      MED_DB_HOST: ${MED_DB_HOST}
+      MED_DB_PORT: ${MED_DB_PORT}
+      MED_DB_USER: ${MED_DB_USER}
+      MED_DB_NAME: ${MED_DB_NAME}
+      MED_DB_PASSWORD: ${MED_DB_PASSWORD}
       ACCESS_TOKEN_KEY: dsjkaiortenfbsu423djlkfut4965j2klfu854
       REFRESH_TOKEN_KEY: 4328kfdljskf34857349iofjkdhsjfu84359fjklg8435
       ACCESS_EXPIRE_TIME_LIFE: 10
       REFRESH_EXPIRE_TIME_LIFE: 30
       ALGORITHM: HS256
       REDIS_URL: redis://med_rd:6379
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - med
     restart: unless-stopped
@@ -31,9 +29,9 @@ services:
     ports:
       - 5434:5432
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: med_pro
+      POSTGRES_USER: ${MED_DB_USER}
+      POSTGRES_PASSWORD: ${MED_DB_PASSWORD}
+      POSTGRES_DB: ${MED_DB_NAME}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres_user -d med_pro"]
       interval: 20s
