@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsIn } from "class-validator";
 
-import { FormatWorks } from "@/utils";
+import { FormatWorks } from "@/utils/shared/entities_enums.js";
 import { PaginationQuery } from "@/utils/shared/validationQuery";
 
 export class DoctorDTO extends PaginationQuery {

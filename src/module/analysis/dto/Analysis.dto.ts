@@ -1,4 +1,4 @@
-import { StatusPacient } from "@/utils";
+import { StatusPacient } from "@/utils/shared/entities_enums.js";
 
 export interface Analysis {
   id: number;

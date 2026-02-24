@@ -1,10 +1,21 @@
 import multer from "multer";
 import { Request } from "express";
 import { join } from "node:path";
+import { mkdirSync, existsSync } from "node:fs";
+
+const publicRoot = join(process.cwd(), "public");
+
+const ensureDir = (dir: string) => {
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+  }
+};
 
 const imageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, join(__dirname, "../../", "public/images/"));
+    const dir = join(publicRoot, "images");
+    ensureDir(dir);
+    cb(null, dir);
   },
   filename(
     req: Request,
@@ -17,7 +28,9 @@ const imageStorage = multer.diskStorage({
 
 const iconsStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, join(__dirname, "../../", "public/icons"));
+    const dir = join(publicRoot, "icons");
+    ensureDir(dir);
+    cb(null, dir);
   },
   filename(
     req: Request,

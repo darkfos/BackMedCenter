@@ -1,6 +1,8 @@
 import { Router, type Request, type Response } from "express";
+import type { JwtPayload } from "jsonwebtoken";
 
-import { uploadImage } from "@/utils/fileManager/storage";
+import { uploadImage } from "@/utils/fileManager/storage.js";
+import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
 import { UserService } from "@/module/users";
 import { RegUserInfo } from "@/module/auth";
 import { AuthService } from "@/module/auth";
@@ -74,6 +76,18 @@ class AuthController {
 
       return AuthController.login(req, res);
     });
+    this.router.patch("/change-password", authMiddleware, (req, res) => {
+      /*
+        #swagger.tags = ['Auth']
+        #swagger.summary = 'Смена пароля'
+        #swagger.description = 'Смена пароля авторизованного пользователя'
+        #swagger.parameters['body'] = { in: 'body', required: true, schema: { new_password: 'string' } }
+        #swagger.responses[200] = { description: 'Пароль успешно изменён', schema: { $ref: '#/definitions/Message' } }
+        #swagger.responses[400] = { description: 'Не удалось изменить пароль', schema: { $ref: '#/definitions/Message' } }
+        #swagger.responses[401] = { description: 'Требуется авторизация', schema: { $ref: '#/definitions/Message' } }
+      */
+      return AuthController.changePassword(req, res);
+    });
     this.router.post("/me", (req, res) => {
       /*
         #swagger.method = 'Post'
@@ -140,6 +154,19 @@ class AuthController {
     return res.status(401).json({
       message: "Пользователь не прошел аутентификацию",
     });
+  }
+
+  static async changePassword(req: Request & { token?: JwtPayload }, res: Response) {
+    const email = req.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const { new_password } = req.body;
+    const updated = await AuthService.changePassword(email, new_password);
+    if (updated) {
+      return res.status(200).json({ message: "Пароль успешно изменён" });
+    }
+    return res.status(400).json({ message: "Не удалось изменить пароль" });
   }
 }
 

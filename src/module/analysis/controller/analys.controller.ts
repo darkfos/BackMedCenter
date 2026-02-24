@@ -5,8 +5,8 @@ import { UserService } from "@/module/users";
 
 import { AnalysisService } from "@/module/analysis/service/AnalysisService";
 import { Analysis } from "@/module/analysis/dto/Analysis.dto";
-import { authMiddleware } from "@/utils";
-import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware";
+import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
+import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware.js";
 
 class AnalysController {
   router: Router;

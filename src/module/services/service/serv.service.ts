@@ -3,9 +3,9 @@ import type { FindOptionsWhere } from "typeorm";
 
 import { dbSource } from "@/db/data-source";
 import { User } from "@/module/users";
-import { FormatWorks, UserTypes } from "@/utils";
+import { FormatWorks, UserTypes } from "@/utils/shared/entities_enums.js";
 import { ReviewEntity } from "../entity/Review.entity";
-import { Pagination } from "@/utils";
+import { Pagination } from "@/utils/other/pagination.js";
 
 export class ServService {
   protected static userRepository: Repository<User> = dbSource.getRepository(User);

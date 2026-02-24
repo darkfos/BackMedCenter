@@ -8,15 +8,22 @@ export async function isAdminMiddleware(
   next: NextFunction,
 ) {
   try {
-    const user = await UserService.getUserByEmail(req.token.email);
-    if (user.isAdmin) {
-      return next();
+    const email = req.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
     }
 
-    throw new Error("Не администратор");
+    const user = await UserService.getUserByEmail(email);
+    if (!user) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+
+    if (user.isAdmin !== true) {
+      return res.status(403).json({ message: "Действие разрешено только администраторам" });
+    }
+
+    return next();
   } catch {
-    return res
-      .status(401)
-      .send({ message: "Действие разрешено только администраторам" });
+    return res.status(403).json({ message: "Действие разрешено только администраторам" });
   }
 }

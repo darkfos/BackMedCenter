@@ -7,26 +7,42 @@ import {
   ManyToOne,
   JoinColumn,
 } from "typeorm";
-import { VisitType } from "@/utils";
 import { Pacients } from "@/module/pacients";
+
+const APPOINTMENT_STATUS_VALUES = ["pending", "confirmed", "cancelled"] as const;
+const VISIT_TYPE_VALUES = ["visit", "notvisit"] as const;
 
 @Entity({ name: "pacientVisits" })
 export class PacientVisit {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ type: "date", nullable: false })
-  dateVisit: Date;
+  dateVisit!: Date;
+
+  @Column({ type: "varchar", length: 10, nullable: true, default: "09:00" })
+  time!: string;
+
+  @Column({ type: "varchar", length: 50, nullable: true })
+  roomNumber!: string | null;
+
+  @Column({
+    type: "enum",
+    nullable: false,
+    default: "pending",
+    enum: APPOINTMENT_STATUS_VALUES,
+  })
+  appointmentStatus!: string;
 
   @Column({
     type: "enum",
     nullable: true,
-    default: VisitType.NOTVISIT,
-    enum: VisitType,
+    default: "notvisit",
+    enum: VISIT_TYPE_VALUES,
   })
-  visit: VisitType;
+  visit!: string;
 
   @ManyToOne(() => Pacients, (pacient) => pacient.visits)
   @JoinColumn({ name: "pacientId" })
-  pacient: Pacients;
+  pacient!: Pacients;
 }

@@ -15,6 +15,10 @@
     {
       "name": "Users",
       "description": "Модуль пользователей"
+    },
+    {
+      "name": "Pacients",
+      "description": "Карты пациентов и медицинская история"
     }
   ],
   "schemes": [
@@ -96,6 +100,423 @@
         }
       }
     },
+    "/profile": {
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Обновление персональных данных",
+        "description": "Обновление имени, email, телефона, номера полиса текущего пользователя (пациента). Все поля опциональны.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/UpdateProfile" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Данные обновлены", "schema": { "$ref": "#/definitions/User" } },
+          "400": { "description": "Ошибка валидации или email занят", "schema": { "$ref": "#/definitions/Message" } },
+          "401": { "description": "Требуется авторизация", "schema": { "$ref": "#/definitions/Message" } }
+        }
+      }
+    },
+    "/me/history": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Моя медицинская история",
+        "description": "Получение всей медицинской истории текущего пользователя (по id пользователя). Объединяет записи по всем картам пациента. Не требует id карты. Требуется авторизация.",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Список записей истории",
+            "schema": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/MedicalHistoryRecord" }
+            }
+          },
+          "401": { "description": "Требуется авторизация", "schema": { "$ref": "#/definitions/Message" } }
+        }
+      }
+    },
+    "/me/appointments": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Мои записи (приёмы к врачам)",
+        "description": "Список всех приёмов текущего пользователя. По всем картам (докторам). Сортировка: дата по убыванию, время. Требуется авторизация.",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Список приёмов",
+            "schema": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/AppointmentRecord" }
+            }
+          },
+          "401": { "description": "Требуется авторизация", "schema": { "$ref": "#/definitions/Message" } }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Создание приёма к врачу",
+        "description": "Запись на приём к врачу. Если карты пациента у этого доктора ещё нет — она создаётся автоматически. Статус новой записи — «Ожидает подтверждения» (pending). Требуется авторизация.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/CreateAppointment" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Приём создан",
+            "schema": { "$ref": "#/definitions/AppointmentRecord" }
+          },
+          "400": {
+            "description": "Ошибка валидации или нет карты у этого доктора",
+            "schema": { "$ref": "#/definitions/Message" }
+          },
+          "401": { "description": "Требуется авторизация", "schema": { "$ref": "#/definitions/Message" } }
+        }
+      }
+    },
+    "/doctor": {
+      "post": {
+        "tags": [
+          "Doctors"
+        ],
+        "summary": "Создание нового доктора",
+        "description": "Создание нового пользователя с типом доктор (только для администраторов)",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "Данные нового доктора: email, password, fullName — обязательны; остальные поля опциональны.",
+            "schema": {
+              "$ref": "#/definitions/CreateDoctor"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Доктор успешно создан",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Ошибка валидации или email уже занят",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "401": {
+            "description": "Требуются права администратора",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      }
+    },
+    "/doctor/{id}": {
+      "patch": {
+        "tags": [
+          "Doctors"
+        ],
+        "summary": "Обновление информации о докторе",
+        "description": "Обновление данных доктора по id (только для администраторов)",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID доктора"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "description": "Поля для обновления. Передавайте только те поля, которые нужно изменить; все опциональны.",
+            "schema": {
+              "$ref": "#/definitions/UpdateDoctor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Данные доктора обновлены",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Ошибка валидации",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "401": {
+            "description": "Требуются права администратора",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          },
+          "404": {
+            "description": "Доктор не найден",
+            "schema": {
+              "$ref": "#/definitions/Message"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Doctors"],
+        "summary": "Удаление доктора",
+        "description": "Удаление доктора по id. Пациенты открепляются от доктора. Только для администраторов.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID доктора"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Доктор удалён",
+            "schema": { "$ref": "#/definitions/Message" }
+          },
+          "400": {
+            "description": "Некорректный id",
+            "schema": { "$ref": "#/definitions/Message" }
+          },
+          "401": {
+            "description": "Требуются права администратора",
+            "schema": { "$ref": "#/definitions/Message" }
+          },
+          "404": {
+            "description": "Доктор не найден",
+            "schema": { "$ref": "#/definitions/Message" }
+          }
+        }
+      }
+    },
+    "/doctor/{id}/avatar": {
+      "patch": {
+        "tags": ["Doctors"],
+        "summary": "Загрузка аватара доктора",
+        "description": "Загрузка/обновление аватара доктора. Доступ: администратор или сам доктор (по id). Формат: multipart/form-data, поле «image» (jpeg, png, jpg).",
+        "consumes": ["multipart/form-data"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID доктора"
+          },
+          {
+            "name": "image",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "description": "Файл изображения (jpeg, png, jpg)"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Аватар обновлён", "schema": { "$ref": "#/definitions/User" } },
+          "400": { "description": "Файл не передан или некорректный", "schema": { "$ref": "#/definitions/Message" } },
+          "401": { "description": "Требуется авторизация", "schema": { "$ref": "#/definitions/Message" } },
+          "403": { "description": "Нет прав на обновление аватара", "schema": { "$ref": "#/definitions/Message" } },
+          "404": { "description": "Доктор не найден", "schema": { "$ref": "#/definitions/Message" } }
+        }
+      }
+    },
+    "/doctor/{id}/available-slots": {
+      "get": {
+        "tags": ["Doctors"],
+        "summary": "Доступные даты и слоты доктора",
+        "description": "Список всех доступных дат в диапазоне [from, to], когда доктор принимает (dayWork), с вложенными свободными слотами по 30 минут (scheduleWork). Учитываются уже занятые записи (pending/confirmed). Если from и to не переданы — период от сегодня до +1 месяц.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID доктора"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date",
+            "description": "Начало периода YYYY-MM-DD"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date",
+            "description": "Конец периода YYYY-MM-DD"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Доступные даты и часы приёма",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "available": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": { "type": "string", "example": "2024-01-24" },
+                      "slots": {
+                        "type": "array",
+                        "items": { "type": "string", "example": "12:00" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректный id или from позже to",
+            "schema": { "$ref": "#/definitions/Message" }
+          },
+          "404": {
+            "description": "Доктор не найден",
+            "schema": { "$ref": "#/definitions/Message" }
+          }
+        }
+      }
+    },
+    "/doctor/{id}/pacients": {
+      "get": {
+        "tags": ["Doctors"],
+        "summary": "Получение пациентов доктора",
+        "description": "Список всех пациентов, закреплённых за доктором. Только для администраторов.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID доктора"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список пациентов",
+            "schema": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/PacientItem" }
+            }
+          },
+          "400": {
+            "description": "Некорректный id",
+            "schema": { "$ref": "#/definitions/Message" }
+          },
+          "401": {
+            "description": "Требуются права администратора",
+            "schema": { "$ref": "#/definitions/Message" }
+          },
+          "404": {
+            "description": "Доктор не найден",
+            "schema": { "$ref": "#/definitions/Message" }
+          }
+        }
+      }
+    },
+    "/pacients/{id}/history": {
+      "get": {
+        "tags": ["Pacients"],
+        "summary": "Получение медицинской истории пациента",
+        "description": "Список записей медицинской истории (диагнозы, назначения) по id пациента (карты пациента). Сортировка по дате, новые первые.",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID карты пациента (pacients.id)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список записей",
+            "schema": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/MedicalHistoryRecord" }
+            }
+          },
+          "400": { "description": "Некорректный id", "schema": { "$ref": "#/definitions/Message" } },
+          "401": { "description": "Требуется авторизация", "schema": { "$ref": "#/definitions/Message" } }
+        }
+      },
+      "post": {
+        "tags": ["Pacients"],
+        "summary": "Создание записи в медицинской истории",
+        "description": "Добавление новой записи (диагноз, назначение) для пациента. Требуется авторизация.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID карты пациента (pacients.id)"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/CreateMedicalHistory" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Запись создана",
+            "schema": { "$ref": "#/definitions/MedicalHistoryRecord" }
+          },
+          "400": {
+            "description": "Ошибка валидации или неверный id пациента/доктора",
+            "schema": { "$ref": "#/definitions/Message" }
+          },
+          "401": { "description": "Требуется авторизация", "schema": { "$ref": "#/definitions/Message" } }
+        }
+      }
+    },
     "/clinic/create": {
       "post": {
         "tags": [
@@ -149,7 +570,7 @@
         "tags": [
           "Clinic"
         ],
-        "summary": "Получение всех типов услуг клиник",
+        "summary": "Получение всех типов услуг клиники",
         "description": "Получение списка всех типов услуг клиники",
         "consumes": [
           "body"
@@ -336,7 +757,7 @@
       }
     },
     "/doctor/list": {
-      "post": {
+      "get": {
         "tags": [
           "Doctors"
         ],
@@ -661,6 +1082,31 @@
         }
       }
     },
+    "/change-password": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Смена пароля",
+        "description": "Смена пароля авторизованного пользователя. Требуется Bearer token.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": { "new_password": { "type": "string", "example": "НовыйПароль123" } }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Пароль успешно изменён", "schema": { "$ref": "#/definitions/Message" } },
+          "400": { "description": "Не удалось изменить пароль", "schema": { "$ref": "#/definitions/Message" } },
+          "401": { "description": "Требуется авторизация", "schema": { "$ref": "#/definitions/Message" } }
+        }
+      }
+    },
     "/me": {
       "post": {
         "tags": [
@@ -785,6 +1231,15 @@
           "type": "string",
           "example": "user"
         },
+        "phone": {
+          "type": "string",
+          "example": "+7 999 123-45-67"
+        },
+        "policyNumber": {
+          "type": "string",
+          "description": "Номер полиса (мед. полис)",
+          "example": "1234567890123456"
+        },
         "isAdmin": {
           "type": "boolean",
           "example": false
@@ -813,6 +1268,213 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/User"
+      }
+    },
+    "MedicalHistoryRecord": {
+      "type": "object",
+      "description": "Запись медицинской истории (диагноз, назначение)",
+      "properties": {
+        "id": { "type": "integer", "example": 1 },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Дата записи" },
+        "diseases": { "type": "string", "maxLength": 165, "description": "Диагноз", "example": "ОРВИ" },
+        "description": { "type": "string", "description": "Назначение/рекомендации", "example": "Обильное питье, постельный режим" },
+        "status": { "type": "string", "enum": ["active", "completed"], "example": "completed" },
+        "doctor": {
+          "type": "object",
+          "description": "Доктор",
+          "properties": {
+            "id": { "type": "integer" },
+            "fullName": { "type": "string", "example": "Доктор Сидоров" },
+            "clinicType": { "type": "object", "properties": { "name": { "type": "string", "example": "Терапевт" } } }
+          }
+        }
+      }
+    },
+    "CreateMedicalHistory": {
+      "type": "object",
+      "required": ["diseases", "doctorId"],
+      "properties": {
+        "diseases": { "type": "string", "maxLength": 165, "description": "Диагноз", "example": "ОРВИ" },
+        "description": { "type": "string", "description": "Назначение/рекомендации", "example": "Обильное питье" },
+        "doctorId": { "type": "integer", "description": "ID доктора" },
+        "status": { "type": "string", "enum": ["active", "completed"], "example": "active" }
+      }
+    },
+    "AppointmentRecord": {
+      "type": "object",
+      "description": "Запись на приём к врачу",
+      "properties": {
+        "id": { "type": "integer", "example": 1 },
+        "dateVisit": { "type": "string", "format": "date", "description": "Дата приёма", "example": "2024-02-20" },
+        "time": { "type": "string", "description": "Время приёма", "example": "10:00" },
+        "roomNumber": { "type": "string", "nullable": true, "description": "Номер кабинета", "example": "205" },
+        "appointmentStatus": { "type": "string", "enum": ["pending", "confirmed", "cancelled"], "example": "confirmed" },
+        "pacient": {
+          "type": "object",
+          "description": "Карта (пациент + доктор)",
+          "properties": {
+            "id": { "type": "integer" },
+            "doctor": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "fullName": { "type": "string", "example": "Доктор Иванов" },
+                "clinicType": { "type": "object", "properties": { "name": { "type": "string", "example": "Кардиолог" } } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "CreateAppointment": {
+      "type": "object",
+      "required": ["doctorId", "dateVisit", "time"],
+      "properties": {
+        "doctorId": { "type": "integer", "description": "ID доктора" },
+        "dateVisit": { "type": "string", "format": "date", "description": "Дата приёма (YYYY-MM-DD)", "example": "2024-02-20" },
+        "time": { "type": "string", "description": "Время приёма (ЧЧ:ММ)", "example": "10:00" },
+        "roomNumber": { "type": "string", "maxLength": 50, "description": "Номер кабинета (опционально)", "example": "205" }
+      }
+    },
+    "UpdateProfile": {
+      "type": "object",
+      "description": "Персональные данные для обновления (все поля опциональны)",
+      "properties": {
+        "fullName": { "type": "string", "maxLength": 255, "example": "Иванов Иван" },
+        "email": { "type": "string", "format": "email", "example": "user@mail.ru" },
+        "phone": { "type": "string", "maxLength": 20, "example": "+7 999 123-45-67" },
+        "policyNumber": { "type": "string", "maxLength": 32, "description": "Номер полиса", "example": "1234567890123456" }
+      }
+    },
+    "CreateDoctor": {
+      "type": "object",
+      "required": ["email", "password", "fullName"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "doctor@clinic.ru",
+          "description": "Email доктора (обязательно)"
+        },
+        "password": {
+          "type": "string",
+          "minLength": 6,
+          "example": "securePassword123",
+          "description": "Пароль, не менее 6 символов (обязательно)"
+        },
+        "fullName": {
+          "type": "string",
+          "maxLength": 255,
+          "example": "Иванов Иван Иванович",
+          "description": "ФИО доктора (обязательно)"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "Путь или URL аватара"
+        },
+        "experience": {
+          "type": "integer",
+          "example": 5,
+          "description": "Опыт работы (лет)"
+        },
+        "studyBuild": {
+          "type": "string",
+          "maxLength": 255,
+          "example": "МГМУ им. Сеченова",
+          "description": "Учебное заведение"
+        },
+        "position": {
+          "type": "string",
+          "maxLength": 185,
+          "example": "Врач-терапевт",
+          "description": "Должность"
+        },
+        "competencies": {
+          "type": "array",
+          "items": { "type": "string" },
+          "example": ["терапия", "диагностика"],
+          "description": "Компетенции"
+        },
+        "consultPrice": {
+          "type": "integer",
+          "example": 1500,
+          "description": "Стоимость консультации"
+        },
+        "scheduleWork": {
+          "type": "string",
+          "maxLength": 50,
+          "example": "8:00 - 17:00",
+          "description": "Расписание работы"
+        },
+        "dayWork": {
+          "type": "object",
+          "description": "Дни работы",
+          "properties": {
+            "days": {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["пн", "вт", "ср"]
+            }
+          }
+        },
+        "clinicTypeId": {
+          "type": "integer",
+          "description": "ID типа клиники (специализации)"
+        },
+        "formatWork": {
+          "type": "string",
+          "enum": ["och", "zoch", "other"],
+          "example": "och",
+          "description": "Формат работы: och — очно, zoch — заочно, other — очно/заочно"
+        }
+      }
+    },
+    "UpdateDoctor": {
+      "type": "object",
+      "description": "Все поля опциональны — обновляются только переданные",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "doctor@clinic.ru"
+        },
+        "password": {
+          "type": "string",
+          "minLength": 6,
+          "example": "securePassword123"
+        },
+        "fullName": {
+          "type": "string",
+          "maxLength": 255,
+          "example": "Иванов Иван Иванович"
+        },
+        "avatar": { "type": "string" },
+        "experience": { "type": "integer", "example": 5 },
+        "studyBuild": { "type": "string", "example": "МГМУ им. Сеченова" },
+        "position": { "type": "string", "example": "Врач-терапевт" },
+        "competencies": {
+          "type": "array",
+          "items": { "type": "string" },
+          "example": ["терапия", "диагностика"]
+        },
+        "consultPrice": { "type": "integer", "example": 1500 },
+        "scheduleWork": { "type": "string", "example": "8:00 - 17:00" },
+        "dayWork": {
+          "type": "object",
+          "properties": {
+            "days": {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["пн", "вт", "ср"]
+            }
+          }
+        },
+        "clinicTypeId": { "type": "integer", "description": "ID типа клиники" },
+        "formatWork": {
+          "type": "string",
+          "enum": ["och", "zoch", "other"],
+          "example": "och"
+        }
       }
     },
     "CreateNews": {
@@ -1079,6 +1741,28 @@
         "status": {
           "type": "string",
           "example": "HEALTHY"
+        }
+      }
+    },
+    "PacientItem": {
+      "type": "object",
+      "description": "Пациент, закреплённый за доктором",
+      "properties": {
+        "id": { "type": "integer", "example": 1 },
+        "description": { "type": "string", "example": "Описание" },
+        "status": {
+          "type": "string",
+          "enum": ["HEALTHY", "SICK", "DEAD", "UNDEFINED", "REMISSION"],
+          "example": "UNDEFINED"
+        },
+        "pacient": {
+          "type": "object",
+          "description": "Данные пользователя-пациента",
+          "properties": {
+            "id": { "type": "integer" },
+            "email": { "type": "string" },
+            "fullName": { "type": "string" }
+          }
         }
       }
     },

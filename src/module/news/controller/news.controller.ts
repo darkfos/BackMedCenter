@@ -4,7 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 
 import { News, NewsFilter } from "@/module/news";
 import { NewsService } from "@/module/news";
-import { authMiddleware } from "@/utils";
+import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
 import redisClient from "@/utils/cache/redis";
 
 class NewsController {

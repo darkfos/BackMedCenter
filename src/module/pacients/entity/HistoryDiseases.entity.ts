@@ -8,8 +8,9 @@ import {
 } from "typeorm";
 import { User } from "@/module/users";
 import { Pacients } from "@/module/pacients";
+import { HistoryRecordStatus } from "@/utils/shared/entities_enums.js";
 
-@Entity()
+@Entity({ name: "history_diseases" })
 export class HistoryDiseases {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -22,6 +23,14 @@ export class HistoryDiseases {
 
   @Column({ type: "text", nullable: true, default: "" })
   description!: string;
+
+  @Column({
+    type: "varchar",
+    length: 20,
+    nullable: true,
+    default: HistoryRecordStatus.ACTIVE,
+  })
+  status!: string;
 
   @ManyToOne(() => User, (user) => user.doctorHistoryDiseases)
   @JoinColumn()

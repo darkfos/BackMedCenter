@@ -3,7 +3,7 @@ import * as path from "node:path";
 
 import { globSync } from "fs";
 import { join, resolve } from "node:path";
-import { StatusPacient } from "@/utils";
+import { StatusPacient } from "@/utils/shared/entities_enums.js";
 
 const outputFile = path.join(__dirname, "..", "..", "..", "swagger.json");
 const endpointsFiles = [

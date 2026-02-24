@@ -3,7 +3,7 @@ import { FindOptionsWhere, ILike, Repository } from "typeorm";
 import { dbSource } from "@/db/data-source";
 import { ReviewEntity } from "@/module/services";
 import { User, UserService } from "@/module/users";
-import { UserTypes } from "@/utils";
+import { UserTypes } from "@/utils/shared/entities_enums.js";
 import type { Review, ReviewFilter } from "@/module/services/dto/Review.dto";
 
 export class ReviewService {

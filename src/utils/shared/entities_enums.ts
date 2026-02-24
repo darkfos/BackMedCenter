@@ -47,3 +47,16 @@ export enum FormatTranslateWorks {
   "ZOCH" = "заочно",
   "OTHER" = "очно, заочно",
 }
+
+/** Статус записи в медицинской истории: активно / завершено */
+export enum HistoryRecordStatus {
+  ACTIVE = "active",
+  COMPLETED = "completed",
+}
+
+/** Статус приёма к врачу */
+export enum AppointmentStatus {
+  PENDING = "pending",
+  CONFIRMED = "confirmed",
+  CANCELLED = "cancelled",
+}

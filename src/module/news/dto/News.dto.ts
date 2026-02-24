@@ -1,4 +1,4 @@
-import { NewsTypes } from "@/utils";
+import { NewsTypes } from "@/utils/shared/entities_enums.js";
 
 export interface News {
   title: string;

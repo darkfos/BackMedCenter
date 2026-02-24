@@ -10,7 +10,7 @@ import {
   ManyToOne,
 } from "typeorm";
 
-import { NewsTypes } from "@/utils";
+import { NewsTypes } from "@/utils/shared/entities_enums.js";
 
 @Entity({ name: "news" })
 export class News {

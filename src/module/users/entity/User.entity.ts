@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from "typeorm";
 
-import { UserTypes, FormatWorks } from "@/utils";
+import { UserTypes, FormatWorks } from "@/utils/shared/entities_enums.js";
 import { News } from "@/module/news";
 import { Pacients } from "@/module/pacients";
 import { Analyses } from "@/module/analysis";
@@ -66,8 +66,17 @@ export class User {
   })
   fullName!: string;
 
-  @Column({ type: "boolean", nullable: true, default: false, select: false })
+  @Column({ type: "varchar", length: 20, nullable: true, default: null })
+  phone!: string | null;
+
+  @Column({ type: "varchar", length: 32, nullable: true, default: null })
+  policyNumber!: string | null;
+
+  @Column({ type: "boolean", nullable: true, default: false })
   isAdmin!: boolean;
+
+  @Column({ type: "boolean", nullable: true, default: false })
+  isConfirmed!: boolean;
 
   @CreateDateColumn({ type: "date", nullable: false })
   createdAt!: Date;

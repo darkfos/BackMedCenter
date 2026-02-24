@@ -1,10 +1,11 @@
+import "reflect-metadata";
 import express from "express";
 import swaggerUI from "swagger-ui-express";
 import { join, resolve } from "node:path";
 
 import { apiConfig } from "@/conf/apiConfig.js";
 import { dbSource } from "@/db/data-source.js";
-import { postAuthMiddleware } from "@/utils";
+import { postAuthMiddleware } from "@/utils/middlewares/authMiddleware.js";
 
 import { authController } from "@/module/auth";
 import { newsController } from "@/module/news";
@@ -22,7 +23,9 @@ app.use(
   swaggerUI.serve,
   swaggerUI.setup(require(join(resolve(), "swagger.json"))),
 );
-app.use("/static", express.static(join(__dirname, '..', "public")));
+const publicRoot = join(process.cwd(), "public");
+app.use("/static", express.static(publicRoot));
+app.use("/statics", express.static(join(publicRoot, "images")));
 
 app.use("/", serviceController.router);
 app.use("/auth", authController.router);

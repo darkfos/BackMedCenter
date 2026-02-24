@@ -5,13 +5,14 @@ import {
   ClinicTypeService,
   ConsultService, ReviewService, ServService,
 } from "@/module/services";
-import { authMiddleware, validateBodyDTOMiddleware } from "@/utils";
-import { uploadIcons } from "@/utils/fileManager/storage";
-import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware";
+import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
+import { validateBodyDTOMiddleware } from "@/utils/middlewares/validateDTOMiddleware.js";
+import { uploadIcons } from "@/utils/fileManager/storage.js";
+import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware.js";
 import { JwtPayload } from "jsonwebtoken";
 import { ReviewFilter } from "@/module/services/dto/Review.dto";
 import { ConsultDTO} from "@/module/services/dto/Consult.dto";
-import { validateQueryDTOMiddleware } from "@/utils/middlewares/validateDTOMiddleware";
+import { validateQueryDTOMiddleware } from "@/utils/middlewares/validateDTOMiddleware.js";
 import { DoctorDTO } from "@/module/services/dto/Doctor.dto";
 
 class ServiceController {

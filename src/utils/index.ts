@@ -14,4 +14,6 @@ export {
   VisitType,
   UserTypes,
   FormatWorks,
+  HistoryRecordStatus,
+  AppointmentStatus,
 } from "./shared/entities_enums.js";

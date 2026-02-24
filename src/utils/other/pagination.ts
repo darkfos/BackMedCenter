@@ -8,13 +8,14 @@ export class Pagination<T extends {}> {
 
     async getPaginationData(where: FindOptionsWhere<T>, relations: Partial<{ [K in keyof T]: string | number | boolean}>, page: number = 1, pageSize: number = this.limit): Promise<IPagination<T>> {
         
-        const [limit, pg] = [Number.isNaN(page) ? 1 : page, Number.isNaN(pageSize) ? this.limit : pageSize];
+        const pageNum = Number.isNaN(page) || page < 1 ? 1 : page;
+        const limitNum = Number.isNaN(pageSize) || pageSize < 1 ? this.limit : pageSize;
 
         const data = await this.repository.findAndCount({
             where: where,
             ...relations,
-            take: limit,
-            skip: (pg - 1) * limit
+            take: limitNum,
+            skip: (pageNum - 1) * limitNum
         });
         
         return {
