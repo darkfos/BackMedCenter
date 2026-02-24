@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddAppointmentFieldsToPacientVisits1730020000000
+export class AddAppointmentFieldsToPacientVisits179930020000000
   implements MigrationInterface
 {
-  name = "AddAppointmentFieldsToPacientVisits1730020000000";
+  name = "AddAppointmentFieldsToPacientVisits179930020000000";
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
