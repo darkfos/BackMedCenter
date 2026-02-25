@@ -9,6 +9,10 @@ export class MedicalServiceDTO {
   @IsOptional()
   @IsString()
   serviceName?: string;
+
+  @IsString()
+  @IsOptional()
+  clinicType?: number;
 }
 
 export class ClinicDTO {

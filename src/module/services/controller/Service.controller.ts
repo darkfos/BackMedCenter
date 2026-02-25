@@ -259,8 +259,11 @@ class ServiceController {
 
       return ServiceController.getDoctors(req, res);
     });
-    this.router.get("/services", validateQueryDTOMiddleware(MedicalServiceDTO), (req: Request, res: Response) => {
+    this.router.get("/services", (req: Request, res: Response) => {
       return ServiceController.listServices(req, res);
+    });
+    this.router.get('/services/filter', validateQueryDTOMiddleware(MedicalServiceDTO), (req: Request, res: Response) => {
+      return ServiceController.filterServices(req, res);
     });
     this.router.post(
       "/services",
@@ -346,8 +349,13 @@ class ServiceController {
   }
 
   static async listServices(req: Request, res: Response) {
-    const list = await MedicalServiceService.getAll(req.query);
+    const list = await MedicalServiceService.getAll();
     return res.status(200).json(list);
+  }
+
+  static async filterServices(req: Request, res: Response) {
+    const filtersServices = await MedicalServiceService.getServiceByFilters(req.query);
+    return res.status(200).json(filtersServices)
   }
 
   static async createService(req: Request, res: Response) {

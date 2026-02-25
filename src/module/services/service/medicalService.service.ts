@@ -50,32 +50,41 @@ export class MedicalServiceService {
     });
   }
 
-  static async getAll(query: MedicalServiceDTO): Promise<Record<string, { name: string, services: ServiceEntity[] }>> {
-    const where: FindOptionsWhere<ServiceEntity> = {};
+  static async getAll(): Promise<Record<string, { name: string, servicesCnt: number }>> {
 
-    if (query.serviceName) {
-      where.title = ILike(`%${query.serviceName}%`);
-    }
+    const allClinicTypes = await this.clinicTypeRepository.find({});
 
     const allServices = await this.repository.find({
       relations: ["clinicType", "doctors"],
-      where: where,
       order: { 'clinicType': { id: 'ASC'} },
     });
 
-    const groupedServices: Record<number, { name: string, clinicLocaleName: string, services: ServiceEntity[] }> = {};
+    const groupedServices: Record<number, { name: string, clinicLocaleName: string, servicesCnt: number }> = {};
+
+    for (const clinicType of allClinicTypes) {
+      groupedServices[clinicType.id] = { name: clinicType.icon, clinicLocaleName: clinicType.name, servicesCnt: 0 };
+    };
 
     for (const service of allServices) {
 
       const key = service?.clinicType?.id ?? 0;
-
-      if (!groupedServices[key]) {
-        groupedServices[key] = { name: service?.clinicType?.icon ?? '', clinicLocaleName: service?.clinicType?.name ?? '', services: [service] };
-      } else {
-        groupedServices[key].services.push(service);
+      if (typeof groupedServices?.[key]?.servicesCnt === 'number') {
+        groupedServices[key].servicesCnt++;
       }
     }
 
     return groupedServices;
+  }
+
+  static async getServiceByFilters(filters: MedicalServiceDTO): Promise<ServiceEntity[]> {
+    const services = this.repository.find({
+      where: {
+        ...(filters.clinicType ? {'clinicType': { 'id': +filters.clinicType }} : {}),
+        ...(filters.serviceName ? {'title': ILike(`%${filters.serviceName.toLowerCase()}%`)} : {})
+      },
+      relations: ['clinicType', 'doctors']
+    })
+
+    return services;
   }
 }
