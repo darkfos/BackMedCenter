@@ -63,14 +63,14 @@ export class MedicalServiceService {
       order: { 'clinicType': { id: 'ASC'} },
     });
 
-    const groupedServices: Record<number, { name: string, services: ServiceEntity[] }> = {};
+    const groupedServices: Record<number, { name: string, clinicLocaleName: string, services: ServiceEntity[] }> = {};
 
     for (const service of allServices) {
 
       const key = service?.clinicType?.id ?? 0;
 
       if (!groupedServices[key]) {
-        groupedServices[key] = { name: service?.clinicType?.name ?? '', services: [service] };
+        groupedServices[key] = { name: service?.clinicType?.icon ?? '', clinicLocaleName: service?.clinicType?.name ?? '', services: [service] };
       } else {
         groupedServices[key].services.push(service);
       }

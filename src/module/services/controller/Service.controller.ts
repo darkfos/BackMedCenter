@@ -19,6 +19,7 @@ import { ConsultDTO} from "@/module/services/dto/Consult.dto";
 import { validateQueryDTOMiddleware } from "@/utils/middlewares/validateDTOMiddleware.js";
 import { DoctorDTO } from "@/module/services/dto/Doctor.dto";
 import { MedicalServiceDTO } from "@/module/services/dto/ClinicType.dto";
+import { ClinicDTO } from "@/module/services/dto/ClinicType.dto";
 
 class ServiceController {
   router: Router;
@@ -33,7 +34,7 @@ class ServiceController {
       "/clinic/create",
       authMiddleware,
       isAdminMiddleware,
-      uploadIcons,
+      validateBodyDTOMiddleware(ClinicDTO),
       (req: Request, res: Response) => {
         /*
         #swagger.method = 'POST'
@@ -44,14 +45,14 @@ class ServiceController {
         #swagger.consumes = 'multipart/form-data'
 
         #swagger.parameters['name'] = {
-          in: 'formData',
+          in: 'body',
           type: 'string',
           required: true,
           description: 'Название типа'
         }
         #swagger.parameters['icon'] = {
-          in: 'formData',
-          type: 'file',
+          in: 'body',
+          type: 'string',
           required: true,
           description: 'Иконка типа'
         }
@@ -275,7 +276,6 @@ class ServiceController {
   static async createClinic(req: Request, res: Response) {
     const clinicTypeData: ClinicType = {
       ...req.body,
-      icon: req.file?.filename,
     };
     const clinicTypeIsCreated = await ClinicTypeService.create(clinicTypeData);
 

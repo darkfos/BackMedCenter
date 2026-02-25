@@ -10,3 +10,12 @@ export class MedicalServiceDTO {
   @IsString()
   serviceName?: string;
 }
+
+export class ClinicDTO {
+
+  @IsString()
+  name?: string;
+
+  @IsString()
+  icon?: string;
+}
