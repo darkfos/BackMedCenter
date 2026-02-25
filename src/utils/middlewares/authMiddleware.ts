@@ -10,7 +10,7 @@ export async function authMiddleware(
   next: NextFunction,
 ) {
 
-  const user = await UserService.getUserByEmail(req.token.email);
+  const user = await UserService.getUserByEmail(req.token?.email);
 
   const userData = await verifyToken(
     (req.headers?.authorization ?? "").split("Bearer ")[1] as string,

@@ -1,4 +1,12 @@
+import { IsOptional, IsString } from "class-validator";
+
 export interface ClinicType {
   name: string;
   icon: string;
+}
+
+export class MedicalServiceDTO {
+  @IsOptional()
+  @IsString()
+  serviceName?: string;
 }

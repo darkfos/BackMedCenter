@@ -19,6 +19,10 @@
     {
       "name": "Pacients",
       "description": "Карты пациентов и медицинская история"
+    },
+    {
+      "name": "Services",
+      "description": "Медицинские услуги (карточки услуг)"
     }
   ],
   "schemes": [
@@ -602,6 +606,50 @@
               "$ref": "#/definitions/ClinicList"
             }
           }
+        }
+      }
+    },
+    "/services": {
+      "get": {
+        "tags": ["Services"],
+        "summary": "Получение всех услуг",
+        "description": "Список всех медицинских услуг с типом (категорией) и привязанными докторами.",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Список услуг",
+            "schema": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/ServiceItem" }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Services"],
+        "summary": "Создание услуги",
+        "description": "Добавление новой медицинской услуги. Только для администраторов. Связь с типом (clinicTypeId) и опционально с докторами (doctorIds).",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": { "$ref": "#/definitions/CreateService" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Услуга создана",
+            "schema": { "$ref": "#/definitions/ServiceItem" }
+          },
+          "400": {
+            "description": "Ошибка валидации или неверный clinicTypeId",
+            "schema": { "$ref": "#/definitions/Message" }
+          },
+          "401": { "description": "Требуется авторизация", "schema": { "$ref": "#/definitions/Message" } },
+          "403": { "description": "Требуются права администратора", "schema": { "$ref": "#/definitions/Message" } }
         }
       }
     },
@@ -1334,6 +1382,47 @@
         "dateVisit": { "type": "string", "format": "date", "description": "Дата приёма (YYYY-MM-DD)", "example": "2024-02-20" },
         "time": { "type": "string", "description": "Время приёма (ЧЧ:ММ)", "example": "10:00" },
         "roomNumber": { "type": "string", "maxLength": 50, "description": "Номер кабинета (опционально)", "example": "205" }
+      }
+    },
+    "ServiceItem": {
+      "type": "object",
+      "description": "Медицинская услуга",
+      "properties": {
+        "id": { "type": "integer", "example": 1 },
+        "title": { "type": "string", "example": "Консультация терапевта" },
+        "description": { "type": "string", "nullable": true },
+        "timeWork": { "type": "string", "nullable": true, "example": "30-60 мин" },
+        "price": { "type": "number", "example": 2500 },
+        "rating": { "type": "number", "example": 4.85 },
+        "recLike": { "type": "integer", "example": 0 },
+        "recDeslike": { "type": "integer", "example": 0 },
+        "includesIn": { "type": "array", "items": { "type": "string" }, "example": ["Первичный осмотр", "Назначение анализов"] },
+        "specialists": { "type": "array", "items": { "type": "string" }, "example": ["Терапевт", "Кардиолог"] },
+        "clinicType": {
+          "type": "object",
+          "properties": { "id": { "type": "integer" }, "name": { "type": "string", "example": "Терапия" } }
+        },
+        "doctors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": { "id": { "type": "integer" }, "fullName": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "CreateService": {
+      "type": "object",
+      "required": ["title", "clinicTypeId"],
+      "properties": {
+        "title": { "type": "string", "maxLength": 150, "description": "Название услуги", "example": "Консультация терапевта" },
+        "description": { "type": "string", "description": "Описание услуги" },
+        "timeWork": { "type": "string", "maxLength": 40, "description": "Длительность", "example": "30-60 мин" },
+        "price": { "type": "number", "minimum": 0, "description": "Стоимость", "example": 2500 },
+        "clinicTypeId": { "type": "integer", "description": "ID типа/категории (med_type)" },
+        "includesIn": { "type": "array", "items": { "type": "string" }, "description": "Что входит в услугу" },
+        "specialists": { "type": "array", "items": { "type": "string" }, "description": "Специалисты (названия)" },
+        "doctorIds": { "type": "array", "items": { "type": "integer" }, "description": "ID докторов, оказывающих услугу" }
       }
     },
     "UpdateProfile": {

@@ -10,6 +10,7 @@ export class ConsultService {
 
   static async create(consultData: ConsultInfo) {
     try {
+      console.log(consultData);
       const newConsult = await this.repository.create(consultData);
       await this.repository.save(newConsult);
       return true;

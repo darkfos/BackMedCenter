@@ -19,7 +19,7 @@ export class Consult {
   username!: string;
 
   @Column({ type: "text", default: "Жалобы пользователя", nullable: true })
-  сomplaints!: string;
+  complaints!: string;
 
   @Column({ type: "varchar", length: 25, nullable: true, default: null })
   phone!: string;

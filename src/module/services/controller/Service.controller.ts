@@ -3,8 +3,12 @@ import { Router, Request, Response } from "express";
 import {
   ClinicType,
   ClinicTypeService,
-  ConsultService, ReviewService, ServService,
+  ConsultService,
+  ReviewService,
+  ServService,
 } from "@/module/services";
+import { MedicalServiceService } from "@/module/services/service/medicalService.service.js";
+import { CreateServiceDTO } from "@/module/services/dto/CreateService.dto.js";
 import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
 import { validateBodyDTOMiddleware } from "@/utils/middlewares/validateDTOMiddleware.js";
 import { uploadIcons } from "@/utils/fileManager/storage.js";
@@ -14,6 +18,7 @@ import { ReviewFilter } from "@/module/services/dto/Review.dto";
 import { ConsultDTO} from "@/module/services/dto/Consult.dto";
 import { validateQueryDTOMiddleware } from "@/utils/middlewares/validateDTOMiddleware.js";
 import { DoctorDTO } from "@/module/services/dto/Doctor.dto";
+import { MedicalServiceDTO } from "@/module/services/dto/ClinicType.dto";
 
 class ServiceController {
   router: Router;
@@ -252,7 +257,19 @@ class ServiceController {
       */
 
       return ServiceController.getDoctors(req, res);
-    })
+    });
+    this.router.get("/services", validateQueryDTOMiddleware(MedicalServiceDTO), (req: Request, res: Response) => {
+      return ServiceController.listServices(req, res);
+    });
+    this.router.post(
+      "/services",
+      authMiddleware,
+      isAdminMiddleware,
+      validateBodyDTOMiddleware(CreateServiceDTO),
+      (req: Request, res: Response) => {
+        return ServiceController.createService(req, res);
+      },
+    );
   }
 
   static async createClinic(req: Request, res: Response) {
@@ -326,6 +343,21 @@ class ServiceController {
     const allDoctors = await ServService.getDoctors(params.username, params.specialization, params.formatWork, Number(params.page), Number(params.pageSize));
 
     return res.status(200).json(allDoctors);
+  }
+
+  static async listServices(req: Request, res: Response) {
+    const list = await MedicalServiceService.getAll(req.query);
+    return res.status(200).json(list);
+  }
+
+  static async createService(req: Request, res: Response) {
+    const record = await MedicalServiceService.create(req.body);
+    if (record) {
+      return res.status(201).json(record);
+    }
+    return res.status(400).json({
+      message: "Не удалось создать услугу. Проверьте clinicTypeId.",
+    });
   }
 }
 

@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import express from "express";
 import swaggerUI from "swagger-ui-express";
+import cors from 'cors';
 import { join, resolve } from "node:path";
 
 import { apiConfig } from "@/conf/apiConfig.js";
@@ -16,6 +17,12 @@ import { serviceController } from "@/module/services";
 
 const app = express();
 
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'refresh'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(

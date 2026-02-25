@@ -4,7 +4,7 @@ import { MinLength, IsPhoneNumber, IsString } from "class-validator";
 
 export interface ConsultInfo {
   username: string;
-  сomplaints: string;
+  complaints: string;
   phone: string;
 }
 
