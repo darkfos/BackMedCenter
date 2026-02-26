@@ -108,4 +108,14 @@ export class MedicalServiceService {
 
     return services;
   }
+
+  static async getOldestDoctors(): Promise<User[]> {
+    const doctors = await this.userRepository.find({
+      where: { userType: UserTypes.DOCTOR },
+      relations: ["clinicType"],
+      order: { 'experience': 'DESC' },
+      take: 3
+    });
+    return doctors;
+  }
 }

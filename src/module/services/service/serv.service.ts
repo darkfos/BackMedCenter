@@ -12,18 +12,15 @@ export class ServService {
   protected static reviewRepository: Repository<ReviewEntity> = dbSource.getRepository(ReviewEntity);
   protected static pagination = new Pagination(10, this.userRepository);
 
-  static async getDoctors(doctorName: string, specialization: string, formatWork: FormatWorks, page: number, pageSize: number) {
+  static async getDoctors(doctorName: string, specialization: number, formatWork: FormatWorks, page: number, pageSize: number) {
     const where: FindOptionsWhere<User> = {
       userType: UserTypes.DOCTOR,
       ...(doctorName && { fullName: ILike(`%${doctorName.toLowerCase()}%`)}),
       ...(formatWork && { formatWork: formatWork }),
-      ...(specialization && { clinicType: { name: specialization } })
+      ...(specialization && { clinicType: { id: specialization } })
     };
 
-    const doctors = await this.pagination.getPaginationData(where, {
-      clinicType: true,
-      doctorReviews: true
-    }, page, pageSize)
+    const doctors = await this.pagination.getPaginationData(where, ['clinicType', 'doctorReviews'], page, pageSize)
 
     return doctors;
   }

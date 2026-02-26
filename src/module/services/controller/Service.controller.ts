@@ -274,6 +274,9 @@ class ServiceController {
 
       return ServiceController.getDoctors(req, res);
     });
+    this.router.get('/doctor/oldest', (req: Request, res: Response) => {
+      return ServiceController.getOldestDoctors(req, res);
+    });
     this.router.get("/services", (req: Request, res: Response) => {
       return ServiceController.listServices(req, res);
     });
@@ -315,6 +318,11 @@ class ServiceController {
 
   static async listClinicWithDoctorCnt(req: Request, res: Response) {
     const data = await MedicalServiceService.getAllWithDoctorCnt();
+    return res.status(200).json(data);
+  }
+
+  static async getOldestDoctors(req: Request, res: Response) {
+    const data = await MedicalServiceService.getOldestDoctors();
     return res.status(200).json(data);
   }
 

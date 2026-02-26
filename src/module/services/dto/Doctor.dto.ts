@@ -10,7 +10,7 @@ export class DoctorDTO extends PaginationQuery {
 
   @IsString()
   @IsOptional()
-  specialization!: string;
+  specialization!: number;
 
   @IsString()
   @IsOptional()
