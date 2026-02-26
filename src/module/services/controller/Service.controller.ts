@@ -101,6 +101,21 @@ class ServiceController {
       */
       return ServiceController.listClinic(req, res);
     });
+    this.router.get("/clinic/doctors", (req: Request, res: Response) => {
+      /*
+        #swagger.method = 'GET'
+        #swagger.tags = ['Clinic']
+        #swagger.summary = 'Получение всех типов клиник с количеством докторов'
+        #swagger.description = 'Возвращает объект: ключ — id типа клиники, значение — name, clinicLocaleName, doctorCnt'
+        #swagger.produces = 'application/json'
+
+        #swagger.responses[200] = {
+          description: 'Типы клиник с количеством докторов по каждому',
+          schema: { $ref: '#/definitions/ClinicTypeWithDoctorCnt' }
+        }
+      */
+      return ServiceController.listClinicWithDoctorCnt(req, res);
+    });
     this.router.post(
       "/consult/create",
       validateBodyDTOMiddleware(ConsultDTO),
@@ -296,6 +311,11 @@ class ServiceController {
   static async listClinic(req: Request, res: Response) {
     const allClinics = await ClinicTypeService.all(req.body);
     return res.status(200).json({ list: allClinics[0], total: allClinics[1] });
+  }
+
+  static async listClinicWithDoctorCnt(req: Request, res: Response) {
+    const data = await MedicalServiceService.getAllWithDoctorCnt();
+    return res.status(200).json(data);
   }
 
   static async createConsult(req: Request, res: Response) {

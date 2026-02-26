@@ -121,6 +121,18 @@ const doc = {
       ],
       total: 1,
     },
+    ClinicTypeWithDoctorCnt: {
+      type: "object",
+      additionalProperties: {
+        type: "object",
+        properties: {
+          name: { type: "string", description: "Иконка типа клиники" },
+          clinicLocaleName: { type: "string", description: "Название типа клиники" },
+          doctorCnt: { type: "number", description: "Количество докторов" },
+        },
+      },
+      example: { "1": { name: "icon.svg", clinicLocaleName: "Терапия", doctorCnt: 5 } },
+    },
     Consult: {
       username: "Андрей Голубцов",
       сomplaints: "Колики в животике",

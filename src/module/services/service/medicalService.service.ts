@@ -5,6 +5,7 @@ import { ClinicTypeEntity } from "@/module/services/entity/ClinicType.entity.js"
 import { User } from "@/module/users";
 import type { CreateServiceDTO } from "@/module/services/dto/CreateService.dto.js";
 import { MedicalServiceDTO } from "@/module/services/dto/ClinicType.dto.js";
+import { UserTypes } from "@/utils/shared/entities_enums.js";
 
 export class MedicalServiceService {
   private static get repository(): Repository<ServiceEntity> {
@@ -74,6 +75,26 @@ export class MedicalServiceService {
     }
 
     return groupedServices;
+  }
+
+  static async getAllWithDoctorCnt(): Promise<Record<number, { name: string; clinicLocaleName: string; doctorCnt: number }>> {
+    const allClinicTypes = await this.clinicTypeRepository.find({});
+    const allDoctors = await this.userRepository.find({
+      where: { userType: UserTypes.DOCTOR },
+      relations: ["clinicType"],
+    });
+
+    const grouped: Record<number, { name: string; clinicLocaleName: string; doctorCnt: number }> = {};
+    for (const ct of allClinicTypes) {
+      grouped[ct.id] = { name: ct.icon, clinicLocaleName: ct.name, doctorCnt: 0 };
+    }
+    for (const doctor of allDoctors) {
+      const key = doctor.clinicType?.id ?? 0;
+      if (typeof grouped[key]?.doctorCnt === "number") {
+        grouped[key].doctorCnt++;
+      }
+    }
+    return grouped;
   }
 
   static async getServiceByFilters(filters: MedicalServiceDTO): Promise<ServiceEntity[]> {
