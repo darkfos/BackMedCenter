@@ -118,4 +118,16 @@ export class MedicalServiceService {
     });
     return doctors;
   }
+
+  static async getTypeConsult() {
+    const typeConsults = await this.userRepository.createQueryBuilder('user')
+    .select(`MIN("user"."consultPrice")`)
+    .addSelect(`MAX("user"."consultPrice")`)
+    .addSelect(`"user"."formatWork"`)
+    .groupBy('"user"."formatWork"')
+    .getRawMany()
+
+    return typeConsults
+  }
+
 }

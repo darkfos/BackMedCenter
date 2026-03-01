@@ -292,6 +292,12 @@ class ServiceController {
         return ServiceController.createService(req, res);
       },
     );
+    this.router.get(
+      '/consult_price',
+      (req: Request, res: Response) => {
+        return ServiceController.getTypeConsultPrice(req, res);
+      }
+    )
   }
 
   static async createClinic(req: Request, res: Response) {
@@ -394,6 +400,11 @@ class ServiceController {
     return res.status(400).json({
       message: "Не удалось создать услугу. Проверьте clinicTypeId.",
     });
+  }
+
+  static async getTypeConsultPrice(req: Request, res: Response) {
+    const typeConsults = await MedicalServiceService.getTypeConsult();
+    return res.status(200).json(typeConsults);
   }
 }
 
