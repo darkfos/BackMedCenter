@@ -2,7 +2,7 @@ import { Repository, DeepPartial } from "typeorm";
 
 import { dbSource } from "@/db/data-source.js";
 import { User } from "@/module/users";
-import { RegUserInfo } from "@/module/auth";
+import { RegUserBodyDTO, RegUserInfo } from "@/module/auth";
 import { hashPassword } from "@/utils/other/hash_password.js";
 import { UserTypes, FormatWorks } from "@/utils/shared/entities_enums.js";
 import type { CreateDoctorDTO } from "@/module/users/dto/CreateDoctor.dto.js";
@@ -26,8 +26,8 @@ export class UserService {
     return dbSource.getRepository(ReviewEntity);
   }
 
-  static async createUser(userData: RegUserInfo): Promise<User> {
-    const newHashedPassword = await hashPassword(userData.password);
+  static async createUser(userData: RegUserBodyDTO): Promise<User> {
+    const newHashedPassword = await hashPassword(userData.password as string);
     userData.password = newHashedPassword;
 
     const repository: Repository<User> = dbSource.getRepository(User);

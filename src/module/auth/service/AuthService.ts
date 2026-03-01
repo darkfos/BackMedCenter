@@ -25,14 +25,14 @@ export class AuthService {
   static async login(userData: RegUserInfo) {
     const user = await this.repository.findOne({
       where: { email: userData.email },
-      select: { id: true, email: true, password: true },
+      select: { id: true, email: true, password: true, isConfirmed: true },
     });
     if (!user?.password) {
       return [];
     }
     const verifiedUser = await verifyPassword(userData.password, user.password);
 
-    if (verifiedUser) {
+    if (verifiedUser && user.isConfirmed) {
       const accessToken = generateToken({ email: user.email }, "access");
       const refreshToken = generateToken({ email: user.email }, "refresh");
 

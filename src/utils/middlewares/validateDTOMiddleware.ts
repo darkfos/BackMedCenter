@@ -11,7 +11,10 @@ export const validateBodyDTOMiddleware = (ValidateSchema: new () => object) => {
         enableImplicitConversion: true,
       });
 
-      await validateOrReject(schema, { forbidUnknownValues: false });
+      await validateOrReject(schema, {
+        forbidUnknownValues: false,
+        skipMissingProperties: false,
+      });
 
       req.body = schema;
       next();

@@ -4,8 +4,9 @@ import type { JwtPayload } from "jsonwebtoken";
 import { uploadImage } from "@/utils/fileManager/storage.js";
 import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
 import { UserService } from "@/module/users";
-import { RegUserInfo } from "@/module/auth";
+import { RegUserBodyDTO, RegUserInfo } from "@/module/auth";
 import { AuthService } from "@/module/auth";
+import { validateBodyDTOMiddleware } from "@/utils";
 
 class AuthController {
   router: Router;
@@ -16,7 +17,7 @@ class AuthController {
   }
 
   initRoutes(): void {
-    this.router.post("/register", uploadImage, (req, res) => {
+    this.router.post("/register", validateBodyDTOMiddleware(RegUserBodyDTO), (req, res) => {
       /*
         #swagger.method = 'post'
         #swagger.tags = ['Auth']
@@ -112,7 +113,7 @@ class AuthController {
   }
 
   static async register(req: Request, res: Response) {
-    const userData: RegUserInfo = {
+    const userData: RegUserBodyDTO = {
       ...req.body,
       avatar: req.file?.filename ?? "",
     };
