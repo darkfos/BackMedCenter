@@ -47,6 +47,24 @@ export class CreateDoctorDTO {
 
   @IsOptional()
   @IsString()
+  education?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  certificates?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  services?: string[];
+
+  @IsOptional()
+  @IsString()
   @MaxLength(185)
   position?: string;
 

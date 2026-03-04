@@ -38,6 +38,22 @@ export class User {
   @Column({ type: "varchar", length: 255, nullable: true, default: null })
   studyBuild!: string;
 
+  /** Образование (вуз, курсы и т.п.) */
+  @Column({ type: "text", nullable: true, default: null })
+  education!: string | null;
+
+  /** Описание врача (биография, специализация) */
+  @Column({ type: "text", nullable: true, default: null })
+  description!: string | null;
+
+  /** Сертификаты (названия) */
+  @Column({ type: "text", array: true, nullable: true, default: [] })
+  certificates!: string[];
+
+  /** Конкретные услуги, предоставляемые врачом */
+  @Column({ type: "text", array: true, nullable: true, default: [] })
+  services!: string[];
+
   @Column({ type: "json", nullable: true, default: { days: ["пн"] } })
   dayWork!: { days: ["пн"] };
 

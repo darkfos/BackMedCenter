@@ -24,4 +24,14 @@ export class ServService {
 
     return doctors;
   }
+
+  /** Получение одного врача по id (для публичной детальной страницы). */
+  static async getDoctorById(id: number): Promise<User | null> {
+    if (Number.isNaN(id)) return null;
+    const doctor = await this.userRepository.findOne({
+      where: { id, userType: UserTypes.DOCTOR },
+      relations: ['clinicType', 'doctorReviews', 'doctorReviews.user'],
+    });
+    return doctor ?? null;
+  }
 }

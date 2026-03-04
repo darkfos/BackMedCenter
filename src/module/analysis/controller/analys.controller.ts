@@ -94,6 +94,9 @@ class AnalysController {
 
   static async myAnalysis(req: Request & JwtPayload, res: Response) {
     const user = await UserService.getUserByEmail(req.token.email);
+    if (!user) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
     const myAnalysis = await AnalysisService.getList({ pacient: user.id });
 
     return res

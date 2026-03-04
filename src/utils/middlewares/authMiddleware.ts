@@ -4,48 +4,53 @@ import { JwtPayload } from "jsonwebtoken";
 import { verifyToken, generateToken } from "@/utils/other/jwt.js";
 import { UserService } from "@/module/users";
 
+type PayloadWithEmail = JwtPayload & { email?: string };
+
+function hasEmail(p: unknown): p is PayloadWithEmail {
+  return typeof p === "object" && p !== null && "email" in p;
+}
+
 export async function authMiddleware(
   req: Request & JwtPayload,
   res: Response,
   next: NextFunction,
 ) {
-
-  const user = await UserService.getUserByEmail(req.token?.email);
-
-  const userData = await verifyToken(
-    (req.headers?.authorization ?? "").split("Bearer ")[1] as string,
-    "access",
-  );
-
-  if (user.isConfirmed !== true) {
-    return res.status(401).json({ message: "Пользователь не подтвержден" });
-  }
-
-  if (userData) {
-    req.token = userData;
-    return next();
-  }
+  const accessToken = (req.headers?.authorization ?? "").split("Bearer ")[1] as string;
+  const accessPayload = accessToken ? await verifyToken(accessToken, "access") : null;
+  let userData: PayloadWithEmail | null = hasEmail(accessPayload) ? accessPayload : null;
 
   if (!userData) {
-    const userRefreshData = await verifyToken(
+    const refreshPayload = await verifyToken(
       (req.headers?.refresh as string) ?? "",
       "refresh",
     );
-
-    if (userRefreshData) {
-      const payload = { email: (userRefreshData as JwtPayload)?.email };
+    if (hasEmail(refreshPayload) && refreshPayload.email) {
+      const payload = { email: refreshPayload.email };
       const newToken = generateToken(payload, "access");
-
       res.set({ token: newToken });
       req.token = payload;
-
-      return next();
+      userData = payload as PayloadWithEmail;
     }
+  } else {
+    req.token = userData;
   }
 
-  return res
-    .status(401)
-    .send({ message: "Не удалось аутентифицировать пользователя" });
+  const email = userData?.email;
+  if (!email) {
+    return res
+      .status(401)
+      .send({ message: "Не удалось аутентифицировать пользователя" });
+  }
+
+  const user = await UserService.getUserByEmail(email);
+  if (!user) {
+    return res.status(401).json({ message: "Пользователь не найден" });
+  }
+  if ((user as { isConfirmed?: boolean }).isConfirmed !== true) {
+    return res.status(401).json({ message: "Пользователь не подтвержден" });
+  }
+
+  return next();
 }
 
 export async function postAuthMiddleware(

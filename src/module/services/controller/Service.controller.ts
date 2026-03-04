@@ -277,6 +277,12 @@ class ServiceController {
     this.router.get('/doctor/oldest', (req: Request, res: Response) => {
       return ServiceController.getOldestDoctors(req, res);
     });
+    this.router.get('/doctor/:id', (req: Request<{ id: string }>, res: Response) => {
+      return ServiceController.getDoctorById(req, res);
+    });
+    this.router.get('/doctor/:id/reviews', (req: Request<{ id: string }>, res: Response) => {
+      return ServiceController.getDoctorReviews(req, res);
+    });
     this.router.get("/services", (req: Request, res: Response) => {
       return ServiceController.listServices(req, res);
     });
@@ -354,14 +360,27 @@ class ServiceController {
   }
 
   static async createReview(req: Request & JwtPayload, res: Response) {
-    const { message, rating, doctorId } = req.body;
-    const reviewData = await ReviewService.create({ message, rating }, doctorId, req.token.email);
+    const email = req.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const { message, rating, doctorId: rawDoctorId } = req.body ?? {};
+    const doctorId = Number(rawDoctorId);
+    if (Number.isNaN(doctorId) || !message || typeof message !== "string" || message.trim() === "") {
+      return res.status(400).json({ message: "Укажите врача (doctorId), текст отзыва (message) и оценку (rating)" });
+    }
+    const ratingNum = rating != null ? Number(rating) : 5;
+    const result = await ReviewService.create(
+      { message: message.trim(), rating: ratingNum },
+      doctorId,
+      email as string,
+    );
 
-    if (reviewData) {
-      return res.status(201).json({ message: "Отзыв был создан"})
+    if (result.success) {
+      return res.status(201).json({ message: "Отзыв был создан" });
     }
 
-    return res.status(400).json({ message: "Не удалось создать отзыв"})
+    return res.status(400).json({ message: result.reason || "Не удалось создать отзыв" });
   }
 
   static async allReviews(req: Request, res: Response) {
@@ -380,6 +399,45 @@ class ServiceController {
     const allDoctors = await ServService.getDoctors(params.username, params.specialization, params.formatWork, Number(params.page), Number(params.pageSize));
 
     return res.status(200).json(allDoctors);
+  }
+
+  static async getDoctorById(req: Request<{ id: string }>, res: Response) {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ message: "Некорректный id доктора" });
+    }
+    const doctor = await ServService.getDoctorById(id);
+    if (!doctor) {
+      return res.status(404).json({ message: "Доктор не найден" });
+    }
+    const reviews = Array.isArray(doctor.doctorReviews) ? doctor.doctorReviews : [];
+    const sanitizedReviews = reviews.map((r) => {
+      const rec = r as unknown as { user?: { password?: string; fullName?: string; [k: string]: unknown }; [k: string]: unknown };
+      const { user, ...reviewRest } = rec;
+      const userSafe = user ? (() => { const { password: __, ...u } = user; return u; })() : undefined;
+      return { ...reviewRest, user: userSafe };
+    });
+    const doc = doctor as unknown as { password?: string; doctorReviews?: unknown; [k: string]: unknown };
+    const { password: _, doctorReviews: __, ...doctorRest } = doc;
+    const body = { ...doctorRest, doctorReviews: sanitizedReviews };
+    return res.status(200).json(body);
+  }
+
+  static async getDoctorReviews(req: Request<{ id: string }>, res: Response) {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ message: "Некорректный id доктора" });
+    }
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = Math.min(50, Math.max(1, Number(req.query.pageSize) || 5));
+    const { list, total } = await ReviewService.getByDoctorId(id, page, pageSize);
+    const sanitized = list.map((r) => {
+      const rec = r as unknown as { user?: { password?: string; fullName?: string; [k: string]: unknown }; [k: string]: unknown };
+      const { user, ...rest } = rec;
+      const userSafe = user ? (() => { const { password: __, ...u } = user; return u; })() : undefined;
+      return { ...rest, user: userSafe };
+    });
+    return res.status(200).json({ list: sanitized, total, page, pageSize });
   }
 
   static async listServices(req: Request, res: Response) {

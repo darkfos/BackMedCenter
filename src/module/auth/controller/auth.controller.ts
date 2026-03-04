@@ -110,6 +110,17 @@ class AuthController {
 
       return AuthController.me(req, res);
     });
+
+    this.router.post("/change-unsigned-password", (req, res) => {
+      /*
+        #swagger.tags = ['Auth']
+        #swagger.summary = 'Смена пароля'
+        #swagger.description = 'Смена пароля не авторизованного пользователя'
+        #swagger.parameters['body'] = { in: 'body', required: true, schema: { email: 'string', password: 'string' } }
+        #swagger.responses[200] = { description: 'Пароль успешно изменён', schema: { $ref: '#/definitions/Message' } }
+      */
+      return AuthController.changeUnsignedPassword(req, res);
+    });
   }
 
   static async register(req: Request, res: Response) {
@@ -164,6 +175,16 @@ class AuthController {
     }
     const { new_password } = req.body;
     const updated = await AuthService.changePassword(email, new_password);
+    if (updated) {
+      return res.status(200).json({ message: "Пароль успешно изменён" });
+    }
+    return res.status(400).json({ message: "Не удалось изменить пароль" });
+  }
+
+  static async changeUnsignedPassword(req: Request, res: Response) {
+    const { email, password } = req.body;
+
+    const updated = await AuthService.changePassword(email, password);
     if (updated) {
       return res.status(200).json({ message: "Пароль успешно изменён" });
     }

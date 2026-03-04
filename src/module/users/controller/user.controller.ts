@@ -6,6 +6,7 @@ import { validateBodyDTOMiddleware } from "@/utils/middlewares/validateDTOMiddle
 import { uploadImage } from "@/utils/fileManager/storage.js";
 import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware.js";
 import { UserService, CreateDoctorDTO, UpdateDoctorDTO, UpdateProfileDTO } from "@/module/users";
+import { ActivityService } from "@/module/activities";
 import { MedicalHistoryService } from "@/module/pacients/service/MedicalHistory.service.js";
 import { AppointmentsService } from "@/module/pacients/service/Appointments.service.js";
 import { CreateAppointmentDTO } from "@/module/pacients/dto/CreateAppointment.dto.js";
@@ -256,6 +257,46 @@ class UserController {
         return UserController.uploadDoctorAvatar(req, res);
       },
     );
+    this.router.get(
+      "/admin/stats",
+      authMiddleware,
+      isAdminMiddleware,
+      async (_req: Request, res: Response) => {
+        return UserController.getAdminStats(res);
+      },
+    );
+    this.router.get(
+      "/admin/pending-approval",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getPendingApproval(req, res);
+      },
+    );
+    this.router.patch(
+      "/admin/pending-approval/:id/approve",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.approveUser(req, res);
+      },
+    );
+    this.router.patch(
+      "/admin/pending-approval/:id/reject",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.rejectUser(req, res);
+      },
+    );
+    this.router.get(
+      "/admin/activities",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getActivities(req, res);
+      },
+    );
   }
 
   static async info(req: Request & JwtPayload, res: Response) {
@@ -349,11 +390,15 @@ class UserController {
     });
   }
 
-  static async createDoctor(req: CreateDoctorRequest, res: Response) {
+  static async createDoctor(req: CreateDoctorRequest & JwtPayload, res: Response) {
     const body = req.body;
     const newDoctor = await UserService.createDoctor(body);
 
     if (newDoctor) {
+      const actor = req.token?.email
+        ? await UserService.getUserByEmail(req.token.email)
+        : null;
+      await ActivityService.log("Добавлен новый сотрудник", actor?.id ?? null).catch(() => {});
       const { password: _, ...rest } = newDoctor;
       return res.status(201).json(rest);
     }
@@ -363,7 +408,7 @@ class UserController {
     });
   }
 
-  static async updateDoctor(req: UpdateDoctorRequest, res: Response) {
+  static async updateDoctor(req: UpdateDoctorRequest & JwtPayload, res: Response) {
     const id = Number(req.params.id);
     if (Number.isNaN(id)) {
       return res.status(400).json({ message: "Некорректный id доктора" });
@@ -372,6 +417,10 @@ class UserController {
     const updated = await UserService.updateDoctor(id, req.body);
 
     if (updated) {
+      const actor = req.token?.email
+        ? await UserService.getUserByEmail(req.token.email)
+        : null;
+      await ActivityService.log("Обновлены данные врача", actor?.id ?? null).catch(() => {});
       return res.status(200).json(updated);
     }
 
@@ -380,7 +429,7 @@ class UserController {
     });
   }
 
-  static async deleteDoctor(req: DoctorIdParamsRequest, res: Response) {
+  static async deleteDoctor(req: DoctorIdParamsRequest & JwtPayload, res: Response) {
     const id = Number(req.params.id);
     if (Number.isNaN(id)) {
       return res.status(400).json({ message: "Некорректный id доктора" });
@@ -389,6 +438,10 @@ class UserController {
     const deleted = await UserService.deleteDoctor(id);
 
     if (deleted) {
+      const actor = req.token?.email
+        ? await UserService.getUserByEmail(req.token.email)
+        : null;
+      await ActivityService.log("Удалён сотрудник (врач)", actor?.id ?? null).catch(() => {});
       return res.status(200).json({ message: "Доктор удалён" });
     }
 
@@ -485,6 +538,62 @@ class UserController {
       return res.status(200).json(updated);
     }
     return res.status(404).json({ message: "Доктор не найден" });
+  }
+
+  static async getAdminStats(res: Response) {
+    const stats = await UserService.getAdminStats();
+    return res.status(200).json(stats);
+  }
+
+  static async getPendingApproval(req: Request, res: Response) {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = Math.min(50, Math.max(1, Number(req.query.pageSize) || 3));
+    const result = await UserService.getPendingApprovalUsers(page, pageSize);
+    return res.status(200).json(result);
+  }
+
+  static async approveUser(req: Request<{ id: string }> & JwtPayload, res: Response) {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ message: "Некорректный id пользователя" });
+    }
+    const ok = await UserService.approveUser(id);
+    if (ok) {
+      const actor = req.token?.email
+        ? await UserService.getUserByEmail(req.token.email)
+        : null;
+      await ActivityService.log("Утверждена регистрация пользователя", actor?.id ?? null).catch(() => {});
+      return res.status(200).json({ message: "Пользователь утверждён" });
+    }
+    return res.status(404).json({ message: "Пользователь не найден" });
+  }
+
+  static async rejectUser(req: Request<{ id: string }> & JwtPayload, res: Response) {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ message: "Некорректный id пользователя" });
+    }
+    const ok = await UserService.rejectUser(id);
+    if (ok) {
+      const actor = req.token?.email
+        ? await UserService.getUserByEmail(req.token.email)
+        : null;
+      await ActivityService.log("Отклонена регистрация пользователя", actor?.id ?? null).catch(() => {});
+      return res.status(200).json({ message: "Регистрация отклонена" });
+    }
+    return res.status(404).json({ message: "Пользователь не найден или уже утверждён" });
+  }
+
+  static async getActivities(req: Request, res: Response) {
+    const limit = Math.min(50, Math.max(1, Number(req.query.limit) || 10));
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = Math.min(100, Math.max(1, Number(req.query.pageSize) || 20));
+    if (req.query.page !== undefined || req.query.pageSize !== undefined) {
+      const result = await ActivityService.getList(page, pageSize);
+      return res.status(200).json(result);
+    }
+    const list = await ActivityService.getRecent(limit);
+    return res.status(200).json(list);
   }
 }
 
