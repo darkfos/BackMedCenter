@@ -1,8 +1,8 @@
 export enum UserTypes {
-  DOCTOR = "doctor",
   PACIENT = "pacient",
-  REGISTER = "register",
-  MANAGER = "manager",
+  ADMIN = "admin",
+  DOCTOR = "doctor",
+  NURSE = "nurse",
 }
 
 export enum FormatWorks {

@@ -18,7 +18,8 @@ export async function isAdminMiddleware(
       return res.status(401).json({ message: "Пользователь не найден" });
     }
 
-    if (user.isAdmin !== true) {
+    const isAdmin = user.isAdmin === true || user.userType === "admin";
+    if (!isAdmin) {
       return res.status(403).json({ message: "Действие разрешено только администраторам" });
     }
 

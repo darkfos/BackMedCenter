@@ -46,7 +46,7 @@ const doc = {
       updatedAt: "24-12-2025",
       userType: {
         default: "DOCTOR",
-        "@enum": ["DOCTOR", "PACIENT", "REGISTER", "MANAGER"],
+        "@enum": ["PACIENT", "ADMIN", "DOCTOR", "NURSE"],
       },
     },
     Users: [

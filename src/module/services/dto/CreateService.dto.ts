@@ -40,11 +40,6 @@ export class CreateServiceDTO {
 
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  specialists?: string[];
-
-  @IsOptional()
-  @IsArray()
   @IsInt({ each: true })
   @Type(() => Number)
   doctorIds?: number[];

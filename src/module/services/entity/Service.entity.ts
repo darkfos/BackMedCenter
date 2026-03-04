@@ -39,9 +39,6 @@ export class ServiceEntity {
   @Column({ type: "json", nullable: true, default: [] })
   includesIn!: string[];
 
-  @Column({ type: "json", nullable: true, default: [] })
-  specialists!: string[];
-
   @ManyToOne(() => ClinicTypeEntity, { nullable: true })
   @JoinColumn({ name: "clinicTypeId" })
   clinicType!: ClinicTypeEntity | null;

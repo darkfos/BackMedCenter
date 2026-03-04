@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEmail, MaxLength, Matches } from "class-validator";
+import { IsString, IsOptional, IsEmail, MaxLength, Matches, IsArray } from "class-validator";
 
 export class UpdateProfileDTO {
   @IsOptional()
@@ -20,4 +20,14 @@ export class UpdateProfileDTO {
   @IsString()
   @MaxLength(32)
   policyNumber?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  certificates?: string[];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(185)
+  position?: string;
 }

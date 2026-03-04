@@ -6,11 +6,15 @@ import { validateBodyDTOMiddleware } from "@/utils/middlewares/validateDTOMiddle
 import { uploadImage } from "@/utils/fileManager/storage.js";
 import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware.js";
 import { UserService, CreateDoctorDTO, UpdateDoctorDTO, UpdateProfileDTO } from "@/module/users";
+import { UserTypes } from "@/utils/shared/entities_enums.js";
 import { ActivityService } from "@/module/activities";
 import { MedicalHistoryService } from "@/module/pacients/service/MedicalHistory.service.js";
 import { AppointmentsService } from "@/module/pacients/service/Appointments.service.js";
 import { CreateAppointmentDTO } from "@/module/pacients/dto/CreateAppointment.dto.js";
 import { DoctorAvailabilityService } from "@/module/pacients/service/DoctorAvailability.service.js";
+import { PrescriptionService } from "@/module/pacients/service/Prescription.service.js";
+import { PrescriptionRenewalRequestService } from "@/module/pacients/service/PrescriptionRenewalRequest.service.js";
+import { AnalysisService } from "@/module/analysis/service/AnalysisService.js";
 
 interface CreateDoctorRequest extends Request {
   body: CreateDoctorDTO;
@@ -145,6 +149,97 @@ class UserController {
       authMiddleware,
       async (req: Request, res: Response) => {
         return UserController.getMyAppointments(req, res);
+      },
+    );
+    this.router.get(
+      "/me/patients/:cardId/prescriptions",
+      authMiddleware,
+      async (req: Request<{ cardId: string }>, res: Response) => {
+        return UserController.getCardPrescriptions(req, res);
+      },
+    );
+    this.router.get(
+      "/me/patients/:cardId/analyses",
+      authMiddleware,
+      async (req: Request<{ cardId: string }>, res: Response) => {
+        return UserController.getCardAnalyses(req, res);
+      },
+    );
+    this.router.get(
+      "/me/patients",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyPatients(req, res);
+      },
+    );
+    this.router.get(
+      "/me/visits-today",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyVisitsToday(req, res);
+      },
+    );
+    this.router.patch(
+      "/me/visits/:id/cancel",
+      authMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.cancelMyVisit(req, res);
+      },
+    );
+    this.router.post(
+      "/me/prescriptions",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.createPrescription(req, res);
+      },
+    );
+    this.router.post(
+      "/me/analyses",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.createAnalysis(req, res);
+      },
+    );
+    this.router.get(
+      "/me/prescriptions",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyPrescriptions(req, res);
+      },
+    );
+    this.router.get(
+      "/me/balance",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyBalance(req, res);
+      },
+    );
+    this.router.post(
+      "/me/prescriptions/:id/renew-request",
+      authMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.createPrescriptionRenewalRequest(req, res);
+      },
+    );
+    this.router.get(
+      "/me/prescription-renewal-requests",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyPrescriptionRenewalRequests(req, res);
+      },
+    );
+    this.router.get(
+      "/me/renewal-requests",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyRenewalRequests(req, res);
+      },
+    );
+    this.router.patch(
+      "/me/renewal-requests/:id",
+      authMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.patchRenewalRequest(req, res);
       },
     );
     this.router.post(
@@ -297,6 +392,62 @@ class UserController {
         return UserController.getActivities(req, res);
       },
     );
+    this.router.post(
+      "/admin/backup",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.backupSystem(req, res);
+      },
+    );
+    this.router.post(
+      "/admin/clear-cache",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.clearCache(req, res);
+      },
+    );
+    this.router.get(
+      "/admin/security-check",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.checkSecurity(req, res);
+      },
+    );
+    this.router.get(
+      "/admin/reports/:type",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request<{ type: string }>, res: Response) => {
+        return UserController.getReport(req, res);
+      },
+    );
+    this.router.post(
+      "/admin/doctors/reset-password",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.resetDoctorsPassword(req, res);
+      },
+    );
+    this.router.get(
+      "/admin/users",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getUsersPage(req, res);
+      },
+    );
+    this.router.patch(
+      "/admin/users/:id",
+      authMiddleware,
+      isAdminMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.updateUserRole(req, res);
+      },
+    );
   }
 
   static async info(req: Request & JwtPayload, res: Response) {
@@ -365,8 +516,290 @@ class UserController {
     if (!user?.id) {
       return res.status(401).json({ message: "Пользователь не найден" });
     }
-    const list = await AppointmentsService.getByUserId(user.id);
-    return res.status(200).json(list);
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = Math.min(50, Math.max(1, Number(req.query.pageSize) || 10));
+    const result = await AppointmentsService.getByUserIdPage(user.id, page, pageSize);
+    return res.status(200).json(result);
+  }
+
+  static async getMyPrescriptions(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = Math.min(50, Math.max(1, Number(req.query.pageSize) || 10));
+    const result = await PrescriptionService.getByPatientUserIdPage(user.id, page, pageSize);
+    return res.status(200).json(result);
+  }
+
+  static async getMyBalance(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    const balance = Number((user as { balance?: number }).balance ?? 0);
+    return res.status(200).json({ balance });
+  }
+
+  static async createPrescriptionRenewalRequest(req: Request<{ id: string }> & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    const prescriptionId = Number(req.params.id);
+    if (Number.isNaN(prescriptionId)) {
+      return res.status(400).json({ message: "Некорректный id назначения" });
+    }
+    const request = await PrescriptionRenewalRequestService.createRequest(user.id, prescriptionId);
+    if (request) {
+      return res.status(201).json({ message: "Запрос на продление рецепта отправлен врачу", request });
+    }
+    return res.status(400).json({
+      message: "Не удалось создать запрос. Проверьте, что назначение принадлежит вам и запрос ещё не отправлялся.",
+    });
+  }
+
+  static async getMyPrescriptionRenewalRequests(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    const list = await PrescriptionRenewalRequestService.getByPatientUserId(user.id);
+    return res.status(200).json({ list });
+  }
+
+  static async getMyRenewalRequests(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.DOCTOR) {
+      return res.status(403).json({ message: "Доступно только врачам" });
+    }
+    const list = await PrescriptionRenewalRequestService.getByDoctorId(user.id);
+    return res.status(200).json({ list });
+  }
+
+  static async patchRenewalRequest(req: Request<{ id: string }> & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.DOCTOR) {
+      return res.status(403).json({ message: "Доступно только врачам" });
+    }
+    const requestId = Number(req.params.id);
+    const status = req.body?.status;
+    if (Number.isNaN(requestId) || (status !== "approved" && status !== "rejected")) {
+      return res.status(400).json({ message: "Укажите status: approved или rejected" });
+    }
+    const ok = await PrescriptionRenewalRequestService.setStatus(requestId, user.id, status);
+    if (ok) {
+      return res.status(200).json({ message: status === "approved" ? "Запрос одобрен" : "Запрос отклонён" });
+    }
+    return res.status(404).json({ message: "Запрос не найден или уже обработан" });
+  }
+
+  static async getMyPatients(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.DOCTOR) {
+      return res.status(403).json({ message: "Доступно только врачам" });
+    }
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = Math.min(50, Math.max(1, Number(req.query.pageSize) || 10));
+    const search = typeof req.query.search === "string" ? req.query.search : undefined;
+    const result = await UserService.getDoctorPatientsPage(user.id, page, pageSize, search);
+    return res.status(200).json(result);
+  }
+
+  static async getMyVisitsToday(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.DOCTOR) {
+      return res.status(403).json({ message: "Доступно только врачам" });
+    }
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = Math.min(50, Math.max(1, Number(req.query.pageSize) || 10));
+    const result = await UserService.getDoctorVisitsToday(user.id, page, pageSize);
+    return res.status(200).json(result);
+  }
+
+  static async cancelMyVisit(req: Request<{ id: string }> & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.DOCTOR) {
+      return res.status(403).json({ message: "Доступно только врачам" });
+    }
+    const visitId = Number(req.params.id);
+    if (Number.isNaN(visitId)) {
+      return res.status(400).json({ message: "Некорректный id визита" });
+    }
+    const ok = await UserService.cancelVisit(visitId, user.id);
+    if (ok) {
+      return res.status(200).json({ message: "Визит отменён" });
+    }
+    return res.status(404).json({ message: "Визит не найден или недоступен для отмены" });
+  }
+
+  static async createPrescription(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.DOCTOR) {
+      return res.status(403).json({ message: "Доступно только врачам" });
+    }
+    const { pacientId, prescriptionName, prescriptionDosage, prescriptionFrequency, prescriptionTime, description } =
+      req.body || {};
+    if (
+      !pacientId ||
+      !prescriptionName ||
+      !prescriptionDosage ||
+      !prescriptionFrequency ||
+      !prescriptionTime ||
+      !description
+    ) {
+      return res.status(400).json({
+        message: "Укажите pacientId (id карты), prescriptionName, prescriptionDosage, prescriptionFrequency, prescriptionTime, description",
+      });
+    }
+    const cardId = Number(pacientId);
+    if (Number.isNaN(cardId)) {
+      return res.status(400).json({ message: "Некорректный pacientId" });
+    }
+    const record = await PrescriptionService.create(user.id, cardId, {
+      prescriptionName,
+      prescriptionDosage,
+      prescriptionFrequency,
+      prescriptionTime,
+      description,
+    });
+    if (record) {
+      return res.status(201).json(record);
+    }
+    return res.status(404).json({ message: "Карта пациента не найдена или недоступна" });
+  }
+
+  static async createAnalysis(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.DOCTOR) {
+      return res.status(403).json({ message: "Доступно только врачам" });
+    }
+    const { pacientId, type, text, assignedDate, costs } = req.body || {};
+    if (!pacientId || !type || !assignedDate) {
+      return res.status(400).json({
+        message: "Укажите pacientId (id карты), type, assignedDate (YYYY-MM-DD)",
+      });
+    }
+    const cardId = Number(pacientId);
+    if (Number.isNaN(cardId)) {
+      return res.status(400).json({ message: "Некорректный pacientId" });
+    }
+    const record = await AnalysisService.createForDoctor(user.id, cardId, {
+      type,
+      text,
+      assignedDate,
+      costs,
+    });
+    if (record) {
+      return res.status(201).json(record);
+    }
+    return res.status(404).json({ message: "Карта пациента не найдена или недоступна" });
+  }
+
+  static async getCardPrescriptions(req: Request<{ cardId: string }> & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.DOCTOR) {
+      return res.status(403).json({ message: "Доступно только врачам" });
+    }
+    const cardId = Number(req.params.cardId);
+    if (Number.isNaN(cardId)) {
+      return res.status(400).json({ message: "Некорректный cardId" });
+    }
+    const list = await PrescriptionService.getByCardIdForDoctor(cardId, user.id);
+    return res.status(200).json({ list });
+  }
+
+  static async getCardAnalyses(req: Request<{ cardId: string }> & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.DOCTOR) {
+      return res.status(403).json({ message: "Доступно только врачам" });
+    }
+    const cardId = Number(req.params.cardId);
+    if (Number.isNaN(cardId)) {
+      return res.status(400).json({ message: "Некорректный cardId" });
+    }
+    const list = await AnalysisService.getByCardIdForDoctor(cardId, user.id);
+    return res.status(200).json({ list });
   }
 
   static async createAppointment(
@@ -381,8 +814,19 @@ class UserController {
     if (!user?.id) {
       return res.status(401).json({ message: "Пользователь не найден" });
     }
+    const doctorId = Number(req.body?.doctorId);
+    if (!Number.isNaN(doctorId) && (user as { userType?: string }).userType === UserTypes.DOCTOR && user.id === doctorId) {
+      return res.status(400).json({ message: "Врач не может записаться к самому себе на приём, консультацию или услугу." });
+    }
     const record = await AppointmentsService.create(user.id, req.body);
     if (record) {
+      const isService = req.body?.bookingType === "service";
+      await ActivityService.log(
+        isService
+          ? "Пользователь записался на услугу"
+          : "Пользователь записался на консультацию",
+        user.id,
+      ).catch(() => {});
       return res.status(201).json(record);
     }
     return res.status(400).json({
@@ -594,6 +1038,101 @@ class UserController {
     }
     const list = await ActivityService.getRecent(limit);
     return res.status(200).json(list);
+  }
+
+  static async backupSystem(req: Request & JwtPayload, res: Response) {
+    const result = await UserService.backupSystem();
+    const actor = req.token?.email
+      ? await UserService.getUserByEmail(req.token.email)
+      : null;
+    await ActivityService.log("Запущено резервное копирование системы", actor?.id ?? null).catch(() => {});
+    return res.status(200).json(result);
+  }
+
+  static async clearCache(req: Request & JwtPayload, res: Response) {
+    const result = await UserService.clearCache();
+    const actor = req.token?.email
+      ? await UserService.getUserByEmail(req.token.email)
+      : null;
+    await ActivityService.log("Очистка кэша системы", actor?.id ?? null).catch(() => {});
+    return res.status(200).json(result);
+  }
+
+  static async checkSecurity(req: Request & JwtPayload, res: Response) {
+    const result = await UserService.checkSecurity();
+    const actor = req.token?.email
+      ? await UserService.getUserByEmail(req.token.email)
+      : null;
+    await ActivityService.log("Проверка безопасности системы", actor?.id ?? null).catch(() => {});
+    return res.status(200).json(result);
+  }
+
+  static async getReport(req: Request<{ type: string }> & JwtPayload, res: Response) {
+    const type = req.params.type as "financial" | "medical" | "users";
+    if (!["financial", "medical", "users"].includes(type)) {
+      return res.status(400).json({ message: "Недопустимый тип отчёта" });
+    }
+    const result = await UserService.getReport(type);
+    const actor = req.token?.email
+      ? await UserService.getUserByEmail(req.token.email)
+      : null;
+    const reportLabels: Record<string, string> = {
+      financial: "Финансовый отчёт",
+      medical: "Медицинский отчёт",
+      users: "Отчёт по пользователям",
+    };
+    await ActivityService.log(
+      `Сформирован отчёт: ${reportLabels[type] ?? type}`,
+      actor?.id ?? null,
+    ).catch(() => {});
+    return res.status(200).json(result);
+  }
+
+  static async resetDoctorsPassword(req: Request & JwtPayload, res: Response) {
+    const { new_password } = req.body;
+    if (!new_password || typeof new_password !== "string") {
+      return res.status(400).json({ message: "Укажите new_password" });
+    }
+    if (new_password.length < 6) {
+      return res.status(400).json({ message: "Пароль должен быть не менее 6 символов" });
+    }
+    const { updated } = await UserService.resetDoctorsPassword(new_password);
+    const actor = req.token?.email
+      ? await UserService.getUserByEmail(req.token.email)
+      : null;
+    await ActivityService.log(
+      `Сброс паролей врачей (установлен для ${updated} врачей)`,
+      actor?.id ?? null,
+    ).catch(() => {});
+    return res.status(200).json({ message: `Пароль установлен для ${updated} врачей`, updated });
+  }
+
+  static async getUsersPage(req: Request, res: Response) {
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = Math.min(100, Math.max(1, Number(req.query.pageSize) || 10));
+    const result = await UserService.getUsersPage(page, pageSize);
+    return res.status(200).json(result);
+  }
+
+  static async updateUserRole(req: Request<{ id: string }>, res: Response) {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ message: "Некорректный id пользователя" });
+    }
+    const { isAdmin, userType } = req.body as { isAdmin?: boolean; userType?: string };
+    const updates: { isAdmin?: boolean; userType?: UserTypes } = {};
+    if (typeof isAdmin === "boolean") updates.isAdmin = isAdmin;
+    if (typeof userType === "string" && ["pacient", "admin", "doctor", "nurse"].includes(userType)) {
+      updates.userType = userType as UserTypes;
+    }
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "Укажите isAdmin и/или userType" });
+    }
+    const ok = await UserService.updateUserRole(id, updates);
+    if (ok) {
+      return res.status(200).json({ message: "Права пользователя обновлены" });
+    }
+    return res.status(404).json({ message: "Пользователь не найден" });
   }
 }
 

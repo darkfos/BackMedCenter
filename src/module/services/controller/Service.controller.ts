@@ -445,15 +445,32 @@ class ServiceController {
     return res.status(200).json(list);
   }
 
+  /** Убирает password из врачей в списке услуг при отдаче в API. */
+  private static sanitizeServicesForResponse(services: unknown[]): unknown[] {
+    return services.map((s) => {
+      const svc = s as { doctors?: Array<{ password?: string; [k: string]: unknown }>; [k: string]: unknown };
+      if (Array.isArray(svc.doctors)) {
+        const doctors = svc.doctors.map((d) => {
+          const { password: _, ...rest } = d;
+          return rest;
+        });
+        return { ...svc, doctors };
+      }
+      return svc;
+    });
+  }
+
   static async filterServices(req: Request, res: Response) {
     const filtersServices = await MedicalServiceService.getServiceByFilters(req.query);
-    return res.status(200).json(filtersServices)
+    const sanitized = ServiceController.sanitizeServicesForResponse(filtersServices);
+    return res.status(200).json(sanitized);
   }
 
   static async createService(req: Request, res: Response) {
     const record = await MedicalServiceService.create(req.body);
     if (record) {
-      return res.status(201).json(record);
+      const [sanitized] = ServiceController.sanitizeServicesForResponse([record]);
+      return res.status(201).json(sanitized);
     }
     return res.status(400).json({
       message: "Не удалось создать услугу. Проверьте clinicTypeId.",

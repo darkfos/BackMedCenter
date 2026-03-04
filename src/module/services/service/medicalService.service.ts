@@ -40,7 +40,6 @@ export class MedicalServiceService {
       timeWork: data.timeWork ?? null,
       price: data.price ?? 2500,
       includesIn: data.includesIn ?? [],
-      specialists: data.specialists ?? [],
       clinicType,
       doctors,
     });

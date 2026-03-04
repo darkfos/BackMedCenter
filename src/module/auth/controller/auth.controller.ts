@@ -6,6 +6,7 @@ import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
 import { UserService } from "@/module/users";
 import { RegUserBodyDTO, RegUserInfo } from "@/module/auth";
 import { AuthService } from "@/module/auth";
+import { ActivityService } from "@/module/activities";
 import { validateBodyDTOMiddleware } from "@/utils";
 
 class AuthController {
@@ -131,6 +132,10 @@ class AuthController {
 
     const newUser = await UserService.createUser(userData);
     if (newUser) {
+      await ActivityService.log(
+        "Зарегистрирован новый пользователь",
+        newUser.id,
+      ).catch(() => {});
       return res
         .status(201)
         .json({ message: "Пользователь был зарегистрирован" });

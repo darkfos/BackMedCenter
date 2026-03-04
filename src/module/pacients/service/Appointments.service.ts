@@ -29,8 +29,34 @@ export class AppointmentsService {
     return await this.visitRepository.find({
       where: { pacient: { id: In(cardIds) } },
       relations: ["pacient", "pacient.doctor", "pacient.doctor.clinicType"],
-      order: { dateVisit: "ASC", time: "ASC" },
+      order: { dateVisit: "DESC", time: "ASC" },
     });
+  }
+
+  /** Визиты пациента с пагинацией (для пациента в ЛК). */
+  static async getByUserIdPage(
+    userId: number,
+    page: number,
+    pageSize: number,
+  ): Promise<{ list: PacientVisit[]; total: number; page: number; pageSize: number }> {
+    const cards = await this.pacientsRepository.find({
+      where: { pacient: { id: userId } },
+      select: ["id"],
+    });
+    const cardIds = cards.map((c) => c.id);
+    if (cardIds.length === 0) {
+      return { list: [], total: 0, page: 1, pageSize: Math.min(50, pageSize) };
+    }
+    const skip = Math.max(0, (page - 1) * pageSize);
+    const take = Math.min(50, Math.max(1, pageSize));
+    const [list, total] = await this.visitRepository.findAndCount({
+      where: { pacient: { id: In(cardIds) } },
+      relations: ["pacient", "pacient.doctor", "pacient.doctor.clinicType"],
+      order: { dateVisit: "DESC", time: "ASC" },
+      skip,
+      take,
+    });
+    return { list, total, page, pageSize: take };
   }
 
   static async create(

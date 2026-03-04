@@ -100,7 +100,7 @@ export class User {
   @UpdateDateColumn({ type: "date", nullable: true })
   updatedAt!: Date;
 
-  @Column({ type: "enum", enum: UserTypes, default: UserTypes.PACIENT, select: false })
+  @Column({ type: "enum", enum: UserTypes, default: UserTypes.PACIENT })
   userType!: UserTypes;
 
   @ManyToOne(() => ClinicTypeEntity, (clinicType) => clinicType.doctors)
@@ -112,6 +112,10 @@ export class User {
 
   @Column({ type: "enum", enum: FormatWorks, default: FormatWorks.OCH })
   formatWork!: FormatWorks;
+
+  /** Баланс счёта пациента (в рублях). */
+  @Column({ type: "decimal", precision: 12, scale: 2, default: 0 })
+  balance!: number;
 
   @OneToMany(() => News, (news) => news.user)
   news!: Array<News>;
