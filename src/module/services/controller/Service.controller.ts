@@ -11,7 +11,6 @@ import { MedicalServiceService } from "@/module/services/service/medicalService.
 import { CreateServiceDTO } from "@/module/services/dto/CreateService.dto.js";
 import { authMiddleware } from "@/utils/middlewares/authMiddleware.js";
 import { validateBodyDTOMiddleware } from "@/utils/middlewares/validateDTOMiddleware.js";
-import { uploadIcons } from "@/utils/fileManager/storage.js";
 import { isAdminMiddleware } from "@/utils/middlewares/adminMiddleware.js";
 import { JwtPayload } from "jsonwebtoken";
 import { ReviewFilter } from "@/module/services/dto/Review.dto";
@@ -20,6 +19,7 @@ import { validateQueryDTOMiddleware } from "@/utils/middlewares/validateDTOMiddl
 import { DoctorDTO } from "@/module/services/dto/Doctor.dto";
 import { MedicalServiceDTO } from "@/module/services/dto/ClinicType.dto";
 import { ClinicDTO } from "@/module/services/dto/ClinicType.dto";
+import { ReviewLikeDTO } from "@/module/services/dto/Review.dto";
 
 class ServiceController {
   router: Router;
@@ -303,6 +303,14 @@ class ServiceController {
       (req: Request, res: Response) => {
         return ServiceController.getTypeConsultPrice(req, res);
       }
+    );
+    this.router.post(
+      '/doctor/set_like',
+      authMiddleware,
+      validateQueryDTOMiddleware(ReviewLikeDTO),
+      (req: Request, res: Response) => {
+        return ServiceController.setDoctorReviewLike(req, res);
+      }
     )
   }
 
@@ -435,9 +443,14 @@ class ServiceController {
       const rec = r as unknown as { user?: { password?: string; fullName?: string; [k: string]: unknown }; [k: string]: unknown };
       const { user, ...rest } = rec;
       const userSafe = user ? (() => { const { password: __, ...u } = user; return u; })() : undefined;
-      return { ...rest, user: userSafe };
+      return { ...rest, user: userSafe, likes: r.likes?.length ?? 0 };
     });
     return res.status(200).json({ list: sanitized, total, page, pageSize });
+  }
+
+  static async setDoctorReviewLike(req: Request, res: Response) {
+    const reviewLikes = await ReviewService.setLike((req as Request & JwtPayload)?.token?.email, Number(req.query.reviewId));
+    return res.status(!reviewLikes.success ? 400 : 200).json(reviewLikes);
   }
 
   static async listServices(req: Request, res: Response) {

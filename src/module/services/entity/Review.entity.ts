@@ -30,6 +30,9 @@ export class ReviewEntity {
   @CreateDateColumn()
   createdAt!: Date;
 
+  @Column({ type: "jsonb", nullable: true, default: [] })
+  likes!: string[];
+
   @ManyToOne(() => User, (user) => user.myReviews)
   @JoinColumn()
   user!: User;
@@ -37,4 +40,5 @@ export class ReviewEntity {
   @ManyToOne(() => User, (user) => user.doctorReviews)
   @JoinColumn()
   doctor!: User;
+
 }

@@ -1,4 +1,5 @@
 import { User } from "@/module/users";
+import { IsNumber, IsNotEmpty } from "class-validator";
 
 export interface Review {
   message: string;
@@ -10,4 +11,9 @@ export interface Review {
 export interface ReviewFilter {
   message?: string;
   rating?: number;
+}
+
+export class ReviewLikeDTO {
+  @IsNotEmpty()
+  reviewId!: number;
 }

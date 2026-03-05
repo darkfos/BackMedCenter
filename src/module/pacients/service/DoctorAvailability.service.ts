@@ -43,7 +43,10 @@ function timeSlotsBetween(startMinutes: number, endMinutes: number): string[] {
 
 export type AvailableSlotsResult = {
   date: string;
+  /** свободные слоты */
   slots: string[];
+  /** занятые слоты (для отображения как disabled с тултипом) */
+  bookedSlots: string[];
 };
 
 export type AvailableDatesWithSlotsResult = {
@@ -138,10 +141,10 @@ export class DoctorAvailabilityService {
       }
 
       const occupied = occupiedByDate.get(dateStr);
+      const bookedSlots = allSlotsTemplate.filter((t) => occupied?.has(t) ?? false);
       const slots = allSlotsTemplate.filter((t) => !occupied?.has(t));
-      if (slots.length > 0) {
-        available.push({ date: dateStr, slots });
-      }
+      // возвращаем все рабочие дни: с свободными и/или занятыми слотами (для отображения занятых как disabled)
+      available.push({ date: dateStr, slots, bookedSlots });
       cursor.setDate(cursor.getDate() + 1);
     }
 

@@ -82,4 +82,35 @@ export class ReviewService {
     });
     return { list, total };
   }
+
+  static async setLike(email: string | undefined, reviewId: number): Promise<{ success: true } | { success: false; reason: string }> {
+    if (!email) {
+      return { success: false, reason: "Требуется авторизация" };
+    }
+
+    const user = await this.userRepository.findOne({
+      where: { email },
+      select: ["id"],
+    });
+
+    if (!user) {
+      return { success: false, reason: "Пользователь не найден" };
+    }
+
+    console.log(user, reviewId, 4328848234);
+    const review = await this.reviewRepository.createQueryBuilder('review')
+      .select('review.likes')
+      .where('review.id = :reviewId', { reviewId })
+      .getOne();
+
+    console.log(review);
+
+    if (review?.likes.includes(user?.id.toString())) {
+      await this.reviewRepository.update(reviewId, { likes: review.likes.filter((likeId) => +likeId !== user?.id) });
+      return { success: true };
+    } else {
+      await this.reviewRepository.update(reviewId, { likes: [...(review?.likes ?? []), user?.id.toString()] });
+      return { success: true };
+    }
+  }
 }

@@ -14,6 +14,8 @@ import { CreateAppointmentDTO } from "@/module/pacients/dto/CreateAppointment.dt
 import { DoctorAvailabilityService } from "@/module/pacients/service/DoctorAvailability.service.js";
 import { PrescriptionService } from "@/module/pacients/service/Prescription.service.js";
 import { PrescriptionRenewalRequestService } from "@/module/pacients/service/PrescriptionRenewalRequest.service.js";
+import { NurseTaskService, NurseTaskFilter } from "@/module/pacients/service/NurseTask.service.js";
+import { InventoryService } from "@/module/pacients/service/Inventory.service.js";
 import { AnalysisService } from "@/module/analysis/service/AnalysisService.js";
 
 interface CreateDoctorRequest extends Request {
@@ -240,6 +242,76 @@ class UserController {
       authMiddleware,
       async (req: Request<{ id: string }>, res: Response) => {
         return UserController.patchRenewalRequest(req, res);
+      },
+    );
+    this.router.get(
+      "/me/tasks",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyTasks(req, res);
+      },
+    );
+    this.router.post(
+      "/me/tasks",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.createMyTask(req, res);
+      },
+    );
+    this.router.patch(
+      "/me/tasks/:id/complete",
+      authMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.completeMyTask(req, res);
+      },
+    );
+    this.router.patch(
+      "/me/tasks/:id/note",
+      authMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.setMyTaskNote(req, res);
+      },
+    );
+    this.router.get(
+      "/me/shift-stats",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyShiftStats(req, res);
+      },
+    );
+    this.router.get(
+      "/me/shift-journal",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyShiftJournal(req, res);
+      },
+    );
+    this.router.get(
+      "/me/inventory",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.getMyInventory(req, res);
+      },
+    );
+    this.router.post(
+      "/me/inventory",
+      authMiddleware,
+      async (req: Request, res: Response) => {
+        return UserController.createInventoryItem(req, res);
+      },
+    );
+    this.router.patch(
+      "/me/inventory/:id/add",
+      authMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.addInventoryQuantity(req, res);
+      },
+    );
+    this.router.patch(
+      "/me/inventory/:id",
+      authMiddleware,
+      async (req: Request<{ id: string }>, res: Response) => {
+        return UserController.updateInventoryItem(req, res);
       },
     );
     this.router.post(
@@ -623,6 +695,254 @@ class UserController {
       return res.status(200).json({ message: status === "approved" ? "Запрос одобрен" : "Запрос отклонён" });
     }
     return res.status(404).json({ message: "Запрос не найден или уже обработан" });
+  }
+
+  static async getMyTasks(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const page = Math.max(1, Number(req.query.page) || 1);
+    const pageSize = Math.min(50, Math.max(1, Number(req.query.pageSize) || 10));
+    const filterRaw = String(req.query.filter || "");
+    const filter: NurseTaskFilter = ["all", "high_priority", "completed"].includes(filterRaw)
+      ? (filterRaw as NurseTaskFilter)
+      : "all";
+    const dateStr = typeof req.query.date === "string" ? req.query.date : "";
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const taskDate = dateStr.length === 10 && dateRegex.test(dateStr) ? dateStr : new Date().toISOString().slice(0, 10);
+    const result = await NurseTaskService.getByNurseForDate(user.id, taskDate, page, pageSize, filter);
+    return res.status(200).json(result);
+  }
+
+  static async createMyTask(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const body = req.body || {};
+    const { patientName, description, room, scheduledTime, taskDate, priority, taskType, analysisId } = body;
+    if (!patientName || !description || !scheduledTime || !taskDate) {
+      return res.status(400).json({
+        message: "Укажите patientName, description, scheduledTime, taskDate",
+      });
+    }
+    const record = await NurseTaskService.create(user.id, {
+      patientName,
+      description,
+      room,
+      scheduledTime: String(scheduledTime).trim().slice(0, 10),
+      taskDate: String(taskDate).trim().slice(0, 10),
+      priority: priority === "high" ? "high" : "normal",
+      taskType: taskType === "analysis" ? "analysis" : taskType === "operation" ? "operation" : "procedure",
+      analysisId: analysisId != null ? Number(analysisId) : null,
+    });
+    if (record) {
+      return res.status(201).json(record);
+    }
+    return res.status(500).json({ message: "Не удалось создать задачу" });
+  }
+
+  static async completeMyTask(req: Request<{ id: string }> & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const taskId = Number(req.params.id);
+    if (Number.isNaN(taskId)) {
+      return res.status(400).json({ message: "Некорректный id задачи" });
+    }
+    const ok = await NurseTaskService.complete(taskId, user.id);
+    if (ok) {
+      return res.status(200).json({ message: "Задача отмечена выполненной" });
+    }
+    return res.status(404).json({ message: "Задача не найдена или уже выполнена" });
+  }
+
+  static async setMyTaskNote(req: Request<{ id: string }> & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const taskId = Number(req.params.id);
+    if (Number.isNaN(taskId)) {
+      return res.status(400).json({ message: "Некорректный id задачи" });
+    }
+    const note = typeof req.body?.note === "string" ? req.body.note : "";
+    const ok = await NurseTaskService.setNote(taskId, user.id, note);
+    if (ok) {
+      return res.status(200).json({ message: "Заметка сохранена" });
+    }
+    return res.status(404).json({ message: "Задача не найдена" });
+  }
+
+  static async getMyShiftStats(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const dateStr = typeof req.query.date === "string" ? req.query.date : "";
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const taskDate =
+      dateStr.length === 10 && dateRegex.test(dateStr) ? dateStr : new Date().toISOString().slice(0, 10);
+    const stats = await NurseTaskService.getShiftStats(user.id, taskDate);
+    return res.status(200).json(stats);
+  }
+
+  static async getMyShiftJournal(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const dateStr = typeof req.query.date === "string" ? req.query.date : "";
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const taskDate =
+      dateStr.length === 10 && dateRegex.test(dateStr) ? dateStr : new Date().toISOString().slice(0, 10);
+    const list = await NurseTaskService.getAllByNurseAndDate(user.id, taskDate);
+    return res.status(200).json({ list });
+  }
+
+  static async getMyInventory(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const list = await InventoryService.getAll();
+    return res.status(200).json({ list });
+  }
+
+  static async createInventoryItem(req: Request & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const { name, quantity, threshold } = req.body || {};
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return res.status(400).json({ message: "Укажите name (название позиции)" });
+    }
+    const record = await InventoryService.create({
+      name: name.trim(),
+      quantity: quantity != null ? Number(quantity) : 0,
+      threshold: threshold != null ? Number(threshold) : 0,
+    });
+    if (record) {
+      return res.status(201).json(record);
+    }
+    return res.status(500).json({ message: "Не удалось создать позицию" });
+  }
+
+  static async addInventoryQuantity(req: Request<{ id: string }> & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ message: "Некорректный id" });
+    }
+    const amount = Number(req.body?.amount ?? 10);
+    if (!Number.isFinite(amount) || amount < 1) {
+      return res.status(400).json({ message: "Укажите amount (число >= 1)" });
+    }
+    const ok = await InventoryService.addQuantity(id, amount);
+    if (ok) {
+      return res.status(200).json({ message: "Количество обновлено" });
+    }
+    return res.status(404).json({ message: "Позиция не найдена" });
+  }
+
+  static async updateInventoryItem(req: Request<{ id: string }> & JwtPayload, res: Response) {
+    const email = req?.token?.email;
+    if (!email) {
+      return res.status(401).json({ message: "Требуется авторизация" });
+    }
+    const user = await UserService.getUserByEmail(email);
+    if (!user?.id) {
+      return res.status(401).json({ message: "Пользователь не найден" });
+    }
+    if ((user as { userType?: string }).userType !== UserTypes.NURSE) {
+      return res.status(403).json({ message: "Доступно только медсёстрам" });
+    }
+    const id = Number(req.params.id);
+    if (Number.isNaN(id)) {
+      return res.status(400).json({ message: "Некорректный id" });
+    }
+    const { name, quantity, threshold } = req.body || {};
+    const data: { name?: string; quantity?: number; threshold?: number } = {};
+    if (typeof name === "string" && name.trim()) data.name = name.trim();
+    if (quantity !== undefined && Number.isFinite(Number(quantity))) data.quantity = Number(quantity);
+    if (threshold !== undefined && Number.isFinite(Number(threshold))) data.threshold = Number(threshold);
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: "Укажите name, quantity или threshold" });
+    }
+    const ok = await InventoryService.update(id, data);
+    if (ok) {
+      return res.status(200).json({ message: "Позиция обновлена" });
+    }
+    return res.status(404).json({ message: "Позиция не найдена" });
   }
 
   static async getMyPatients(req: Request & JwtPayload, res: Response) {
